@@ -1,11 +1,10 @@
 {
   "name": "paperback-writer",
   "license": "MIT",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "private": "false",
   "scripts": {
     "build": "tsup index.ts --format cjs,esm --dts",
     "release": "pnpm run build && changeset publish",
