@@ -1,13 +1,13 @@
-import {useEditor} from 'paperback-writer'
+import { Canvas, CanvasConfig } from "paperback-writer"
+
+const config: CanvasConfig = {
+  debugMode: true,
+}
 
 function App() {
-  const editor = useEditor();
-
-  return (
-    <>
-      {editor}
-    </>
-  )
-}
+  return <div>
+    <Canvas {...config} style={{ width: '700px', height: '500px', border: '2px solid red', backgroundColor: ''}} />
+  </div>
+} 
 
 export default App

@@ -23,6 +23,20 @@ export function renderElement(token: TokenType, key: string) {
     case 1:
       console.error("Dedent detected");
       return <span />;
+    case 185:
+      return <span key={key} />;
+    case 186 /** identifier */:
+      return (
+        <span className={className} key={key}>
+          {token.value}
+        </span>
+      );
+    case 187 /** newline */:
+      return <br />;
+    case 188 /** whitespace */:
+      return (
+        <span key={key}>{"\u00A0".repeat(Number.parseInt(token.value!))}</span>
+      );
     default:
       return (
         <span className={className} key={key}>

@@ -1,7 +1,7 @@
 {
   "name": "paperback-writer",
   "license": "MIT",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",

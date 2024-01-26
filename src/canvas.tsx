@@ -64,7 +64,7 @@ function Canvas(props: HTMLAttributes<HTMLDivElement> & CanvasConfig) {
 
 interface CanvasConfig {
   debugMode: boolean;
-  debuggerProps: HTMLAttributes<HTMLDivElement>;
+  debuggerProps?: HTMLAttributes<HTMLDivElement>;
 }
 
 export { Canvas, CanvasConfig };
