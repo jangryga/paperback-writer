@@ -48,25 +48,27 @@ function griddify(
       });
       index += 1;
       children = [];
-    } else if (token.kind === "Indent" || token.kind === "Dedent") {
-      indent +=
-        token.kind === "Indent"
-          ? Number.parseInt(token.value!)
-          : -Number.parseInt(token.value!);
-      children.push(
-        renderElement(
-          {
-            kind: "Whitespace",
-            value: indent.toString(),
-            category: "Whitespace",
-          },
-          key,
-          CSSConfig
-        )
-      );
-      continue;
+    } else {
+      if (token.kind === "Indent" || token.kind === "Dedent") {
+        indent +=
+          token.kind === "Indent"
+            ? Number.parseInt(token.value!)
+            : -Number.parseInt(token.value!);
+        children.push(
+          renderElement(
+            {
+              kind: "Whitespace",
+              value: indent.toString(),
+              category: "Whitespace",
+            },
+            key,
+            CSSConfig
+          )
+        );
+        continue;
+      }
+      children.push(renderElement(token, key, CSSConfig));
     }
-    children.push(renderElement(token, key, CSSConfig));
   }
   return grid;
 }
