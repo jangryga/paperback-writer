@@ -28,7 +28,7 @@ function griddify(
   let children: JSX.Element[] = [];
   for (const [idx, token] of tokens.entries()) {
     const key = `${index}-${children.length}-${idx}`;
-
+    if (token.kind === "Dedent") continue;
     if (token.kind === "Eof") {
       grid.rows.push({
         index,
