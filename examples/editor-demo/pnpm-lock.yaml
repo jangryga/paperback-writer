@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   paperback-writer:
-    specifier: 0.0.12
-    version: 0.0.12(lexer-rs@0.1.31)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.0.14
+    version: 0.0.14(lexer-rs@0.1.31)(react-dom@18.2.0)(react@18.2.0)
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -1617,8 +1617,8 @@ packages:
       p-limit: 3.1.0
     dev: true
 
-  /paperback-writer@0.0.12(lexer-rs@0.1.31)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-cY+epTRhk6pAKf2qQJMKChs6H+LsHTD9JCH07ruBC41a1QUTVxkSakldNpbS8uci5hFsSlI5XtnTwx0QAE4+Vw==}
+  /paperback-writer@0.0.14(lexer-rs@0.1.31)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-D+1BhPSPbPFsyDuoM1RJoAci8b2HJmMvdLUfKXZT0JYWkTA36oUAdjpV3lP4Iwhsw077q25Ee41CXodHLAcpNg==}
     peerDependencies:
       lexer-rs: 0.1.31
       react: ^18.0.0
