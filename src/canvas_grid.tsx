@@ -1,5 +1,6 @@
 import { TokenType } from "lexer-rs";
 import { renderElement } from "./canvas_renderer";
+import { CanvasConfigType } from "./canvas_context";
 
 interface GridRow {
   index: number;
@@ -11,7 +12,10 @@ interface Grid {
   rows: GridRow[];
 }
 
-function griddify(tokens: TokenType[]): Grid {
+function griddify(
+  tokens: TokenType[],
+  CSSConfig: CanvasConfigType["stylesConfig"]
+): Grid {
   const grid: Grid = { rows: [] };
   let indent = 0;
   let index = 0;
@@ -56,12 +60,13 @@ function griddify(tokens: TokenType[]): Grid {
             value: indent.toString(),
             category: "Whitespace",
           },
-          key
+          key,
+          CSSConfig
         )
       );
       continue;
     }
-    children.push(renderElement(token, key));
+    children.push(renderElement(token, key, CSSConfig));
   }
   return grid;
 }

@@ -1,4 +1,4 @@
-import { TokenType, LexerWrapper } from "lexer-rs";
+import { TokenType, LexerWrapper, TokenCategory } from "lexer-rs";
 import {
   ReactNode,
   createContext,
@@ -14,30 +14,35 @@ import {
 } from "./canvas_selection";
 import ReactDOMServer from "react-dom/server";
 
+export interface CanvasConfigType {
+  debugMode: Boolean;
+  stylesConfig: {
+    styles: Record<keyof typeof TokenCategory, string>;
+    useTailwind: boolean;
+  };
+}
+
 interface CanvasContextType {
   tokens: TokenType[];
   lexer: LexerWrapper;
   grid: Grid;
   selection: SelectionNode | null;
+  config: CanvasConfigType;
 }
+
 type CanvasActionType =
   | { type: "SET"; payload: string }
   | { type: "SAVE_SELECTION"; payload: { element: HTMLDivElement } }
-  | { type: "RESTORE_SELECTION"; payload: { element: HTMLDivElement } };
+  | { type: "RESTORE_SELECTION"; payload: { element: HTMLDivElement } }
+  | { type: "SET_CONFIG"; payload: { config: CanvasConfigType } };
 type UseCanvasManagerResult = ReturnType<typeof useCanvasManager>;
-
-const CanvasContext = createContext<UseCanvasManagerResult>({
-  context: null as any,
-  updateTree: (_: string) => {},
-  saveSelection: () => {},
-  restoreState: () => {},
-});
 
 function useCanvasManager(initialCanvasContext: CanvasContextType): {
   context: CanvasContextType;
   updateTree: (text: string) => void;
   saveSelection: (element: HTMLDivElement) => void;
   restoreState: (element: HTMLDivElement) => void;
+  setConfig: (config: CanvasConfigType) => void;
 } {
   const [context, dispatch] = useReducer(
     (state: CanvasContextType, action: CanvasActionType) => {
@@ -51,7 +56,7 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
         }
         case "SET": {
           const tokens = state.lexer.tokenize(action.payload);
-          const grid = griddify(tokens);
+          const grid = griddify(tokens, state.config.stylesConfig);
           return {
             ...state,
             tokens,
@@ -66,6 +71,8 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           restoreSelection(element, state.selection);
           return { ...state };
         }
+        case "SET_CONFIG":
+          return { ...state, config: action.payload.config };
 
         default:
           throw new Error("unimplemented");
@@ -86,8 +93,20 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
     dispatch({ type: "RESTORE_SELECTION", payload: { element } });
   }, []);
 
-  return { context, updateTree, saveSelection, restoreState };
+  const setConfig = useCallback((config: CanvasConfigType) => {
+    dispatch({ type: "SET_CONFIG", payload: { config } });
+  }, []);
+
+  return { context, updateTree, saveSelection, restoreState, setConfig };
 }
+
+const CanvasContext = createContext<UseCanvasManagerResult>({
+  context: null as any,
+  updateTree: (_: string) => {},
+  saveSelection: () => {},
+  restoreState: () => {},
+  setConfig: () => {},
+});
 
 export const CanvasProvider = ({
   initialContext,
@@ -123,3 +142,8 @@ export const useRestoreSelection =
     const { restoreState } = useContext(CanvasContext);
     return restoreState;
   };
+
+export const useSetCanvasConfig = (): UseCanvasManagerResult["setConfig"] => {
+  const { setConfig } = useContext(CanvasContext);
+  return setConfig;
+};

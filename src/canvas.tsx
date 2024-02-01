@@ -4,14 +4,16 @@ import {
   useSaveEditorSelection,
   useRestoreSelection,
   CanvasProvider,
+  CanvasConfigType,
 } from "./canvas_context";
 import { LexerWrapper } from "lexer-rs";
 import { DebugPanel } from "./canvas_debug_panel";
+import { defaultConfig } from "./utils/defaults";
 
 function CanvasInner({
-  debugMode,
+  canvasConfig,
   ...props
-}: HTMLAttributes<HTMLDivElement> & CanvasConfig) {
+}: HTMLAttributes<HTMLDivElement> & { canvasConfig: CanvasConfigType }) {
   useEffect(() => {
     ref.current?.focus();
   }, []);
@@ -41,7 +43,9 @@ function CanvasInner({
   );
 }
 
-function Canvas(props: HTMLAttributes<HTMLDivElement> & CanvasConfig) {
+function Canvas(
+  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType }
+) {
   return (
     <CanvasProvider
       initialContext={{
@@ -49,22 +53,21 @@ function Canvas(props: HTMLAttributes<HTMLDivElement> & CanvasConfig) {
         tokens: [],
         grid: { rows: [] },
         selection: null,
+        config: props.canvasConfig ?? defaultConfig,
       }}
     >
-      {props.debugMode && (
+      {props.canvasConfig?.debugMode && (
         <>
           <DebugPanel />
           <div className="flex gap-2"></div>
         </>
       )}
-      <CanvasInner {...props} />
+      <CanvasInner
+        {...props}
+        canvasConfig={props.canvasConfig ?? defaultConfig}
+      />
     </CanvasProvider>
   );
 }
 
-interface CanvasConfig {
-  debugMode: boolean;
-  debuggerProps?: HTMLAttributes<HTMLDivElement>;
-}
-
-export { Canvas, CanvasConfig };
+export { Canvas, CanvasConfigType };

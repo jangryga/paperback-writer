@@ -1,7 +1,7 @@
 import { CanvasConfigType } from "../canvas_context";
 
 export const defaultConfig: CanvasConfigType = {
-  debugMode: true,
+  debugMode: false,
   stylesConfig: {
     useTailwind: false,
     styles: {
@@ -20,5 +20,10 @@ export const defaultConfig: CanvasConfigType = {
   },
 };
 
-export const defaultTailwindColors: CanvasConfigType["stylesConfig"]["styles"] =
-  Object(defaultConfig.stylesConfig.styles).map((k, v) => ({ k: `text-${v}` }));
+export const defaultTailwindColors = Object.entries(
+  defaultConfig.stylesConfig.styles
+).reduce((accumulator, [key, val]) => {
+  // @ts-ignore
+  accumulator[key] = `text-${val}`;
+  return accumulator;
+}, {}) as CanvasConfigType["stylesConfig"]["styles"];
