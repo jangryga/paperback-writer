@@ -56,8 +56,8 @@ devDependencies:
     specifier: ^0.4.3
     version: 0.4.5(eslint@8.56.0)
   lexer-rs:
-    specifier: 0.1.31
-    version: 0.1.31
+    specifier: 0.1.33
+    version: 0.1.33
   prettier:
     specifier: ^3.0.3
     version: 3.2.4
@@ -1977,8 +1977,8 @@ packages:
       type-check: 0.4.0
     dev: true
 
-  /lexer-rs@0.1.31:
-    resolution: {integrity: sha512-WNYuSx16az+Ecw48KE9n6DofsGQd7t1iQEY14mILAinOqHR2r9yiM7kv3+5izHIwQE2S9usnub6C42b2RWHOAQ==}
+  /lexer-rs@0.1.33:
+    resolution: {integrity: sha512-HCnQYZsz7m9qxj/ixdfefTPb7mNhJfKg2UwcZ4a65rUJ3ZIZNRxtjtFBmRir25AhdNPfRwcBF+rqEdvo3uRiHA==}
     dev: true
 
   /lilconfig@3.0.0:

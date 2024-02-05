@@ -1,5 +1,7 @@
 // prettier-ignore
-const tokenTable = ["    ", "", "False",
+const tokenTable = ["    ", "", "'''",
+  "#",
+  "False",
   "None",
   "True",
   "and",
@@ -190,6 +192,6 @@ const tokenTable = ["    ", "", "False",
 
 export function tokenLookup(index: number): string {
   if (index === 1) throw new Error("Dedents not allowed");
-  else if (index > 184) throw new Error("Index of bounds");
-  return tokenTable[index] as string;
+  else if (index > 190) throw new Error("Index of bounds");
+  return tokenTable[index];
 }

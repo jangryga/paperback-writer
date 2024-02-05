@@ -9,14 +9,20 @@ export function renderElement(
 ) {
   const textColor =
     CSSConfig.styles[token.category as keyof typeof TokenCategory];
-
   switch (TokenKind[token.kind as keyof typeof TokenKind]) {
-    case 1:
+    case 1: {
       console.error("Dedent detected");
       return <span />;
-    case 185:
+    }
+    case 2 /* StringMultiline */:
+      return <span key={key}>{token.value}</span>;
+    case 3 /* CommentSingleline */:
+      return <span key={key}>{token.value}</span>;
+    case 61 /* string */:
+      return <span key={key}>{token.value}</span>;
+    case 187 /* Eof */:
       return <span key={key} />;
-    case 186 /** identifier */:
+    case 188 /* Identity */:
       return (
         <span
           {...(CSSConfig.useTailwind
@@ -27,9 +33,9 @@ export function renderElement(
           {token.value}
         </span>
       );
-    case 187 /** newline */:
+    case 189 /** Newline */:
       return <br />;
-    case 188 /** whitespace */:
+    case 190 /** Whitespace */:
       return (
         <span key={key}>{"\u00A0".repeat(Number.parseInt(token.value!))}</span>
       );
