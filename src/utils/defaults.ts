@@ -16,6 +16,7 @@ export const defaultConfig: CanvasConfigType = {
       Identifier: "#7f1d1d",
       Whitespace: "#000000",
       Eof: "#000000",
+      Comment: "#1cda10",
     },
   },
 };
