@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   paperback-writer:
-    specifier: 0.0.14
-    version: 0.0.14(lexer-rs@0.1.31)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.0.15
+    version: 0.0.15(lexer-rs@0.1.33)(react-dom@18.2.0)(react@18.2.0)
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -1506,8 +1506,8 @@ packages:
       type-check: 0.4.0
     dev: true
 
-  /lexer-rs@0.1.31:
-    resolution: {integrity: sha512-WNYuSx16az+Ecw48KE9n6DofsGQd7t1iQEY14mILAinOqHR2r9yiM7kv3+5izHIwQE2S9usnub6C42b2RWHOAQ==}
+  /lexer-rs@0.1.33:
+    resolution: {integrity: sha512-HCnQYZsz7m9qxj/ixdfefTPb7mNhJfKg2UwcZ4a65rUJ3ZIZNRxtjtFBmRir25AhdNPfRwcBF+rqEdvo3uRiHA==}
     dev: false
 
   /locate-path@6.0.0:
@@ -1617,14 +1617,14 @@ packages:
       p-limit: 3.1.0
     dev: true
 
-  /paperback-writer@0.0.14(lexer-rs@0.1.31)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-D+1BhPSPbPFsyDuoM1RJoAci8b2HJmMvdLUfKXZT0JYWkTA36oUAdjpV3lP4Iwhsw077q25Ee41CXodHLAcpNg==}
+  /paperback-writer@0.0.15(lexer-rs@0.1.33)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-1413DOsBObcnP4uynAr7wv4TsTWk/MuEiC4NbhjjbT3ZPmFIysWvQGGP6SdbeVjrxgRjILjpi0Zj+gU6x/vSAA==}
     peerDependencies:
-      lexer-rs: 0.1.31
+      lexer-rs: 0.1.33
       react: ^18.0.0
       react-dom: ^18.0.0
     dependencies:
-      lexer-rs: 0.1.31
+      lexer-rs: 0.1.33
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
