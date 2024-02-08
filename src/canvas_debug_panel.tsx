@@ -23,11 +23,15 @@ export function DebugPanel(props: HTMLAttributes<HTMLDivElement>) {
           <ul style={{ overflowY: "hidden", height: "70%" }}>
             {batchTokenLines(tokens).map((tokens, idx) => (
               <li key={idx} style={{ overflowX: "hidden" }}>
-                {tokens.map((t) => t.kind).join(" | ")}
+                {tokens
+                  .map((t) => {
+                    if (t.value) return `${t.kind}+${t.value}+${t.category}`;
+                    return t.kind;
+                  })
+                  .join(" | ")}
               </li>
             ))}
           </ul>
-          <div style={{ borderTop: "1px solid #383838" }}>range</div>
         </div>
         <ul style={{ overflowY: "auto" }}>
           {gridRows.map((row, idx) => (

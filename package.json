@@ -7,6 +7,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup index.ts --format cjs,esm --dts",
+    "build:watch": "tsup index.ts --format cjs,esm --dts --watch --ignore-watch examples",
+    "dev": "concurrently \"pnpm build:watch\" \"pnpm -C ./examples/editor-demo dev\"",
     "lint": "tsc"
   },
   "devDependencies": {
@@ -14,9 +16,7 @@
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "lexer-rs": "0.1.33",
-    "tsup": "^8.0.1",
-    "typescript": "^5.3.3",
+    "concurrently": "^8.2.2",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-standard-with-typescript": "^39.1.1",
@@ -27,7 +27,10 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
-    "prettier": "^3.0.3"
+    "lexer-rs": "0.1.33",
+    "prettier": "^3.0.3",
+    "tsup": "6.6.2",
+    "typescript": "^5.3.3"
   },
   "peerDependencies": {
     "lexer-rs": "0.1.33",
