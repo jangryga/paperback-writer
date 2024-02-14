@@ -1,4 +1,5 @@
 import { defaultConfig, Canvas, CanvasConfigType } from "paperback-writer";
+import "paperback-writer/dist/index.css";
 
 const config: CanvasConfigType = { ...defaultConfig };
 config.stylesConfig.styles.Identifier = "green";

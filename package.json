@@ -1,7 +1,7 @@
 {
   "name": "paperback-writer",
   "license": "MIT",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -35,6 +35,9 @@
     "tsup": "6.6.2",
     "typescript": "^5.3.3"
   },
+  "sideEffects": [
+    "./dist/index.css"
+  ],
   "dependencies": {
     "lexer-rs": "0.1.33"
   },

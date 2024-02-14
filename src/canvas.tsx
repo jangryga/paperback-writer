@@ -10,6 +10,8 @@ import { LexerWrapper } from "lexer-rs";
 import { DebugPanel } from "./canvas_debug_panel";
 import { defaultConfig } from "./utils/defaults";
 
+import "./index.css";
+
 function CanvasInner({
   canvasConfig,
   ...props
@@ -63,15 +65,6 @@ function Canvas(
       {props.canvasConfig?.debugMode && (
         <>
           <DebugPanel />
-          <div
-            // className="flex gap-2"
-            className="bg-red-200"
-            style={{
-              height: "50px",
-              width: "50px",
-              border: "1px solid black",
-            }}
-          ></div>
         </>
       )}
       <CanvasInner
