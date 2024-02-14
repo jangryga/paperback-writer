@@ -1,4 +1,9 @@
 examples
+src
 .vscode
+postcss.config.js
+tsconfig.json
+cspell.json
+tailwind.config.js
 
 .DS_Store
