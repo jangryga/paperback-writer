@@ -14,20 +14,24 @@ import {
 } from "./canvas_selection";
 import ReactDOMServer from "react-dom/server";
 
-export interface CanvasConfigType {
-  debugMode: Boolean;
-  stylesConfig: {
-    styles: Record<keyof typeof TokenCategory, string>;
-    useTailwind: boolean;
-  };
-}
-
 interface CanvasContextType {
   tokens: TokenType[];
   lexer: LexerWrapper;
   grid: Grid;
   selection: SelectionNode | null;
   config: CanvasConfigType;
+  debugger: {
+    encoder: TextEncoder | null;
+    input: number[];
+  };
+}
+
+export interface CanvasConfigType {
+  debugMode: Boolean;
+  stylesConfig: {
+    styles: Record<keyof typeof TokenCategory, string>;
+    useTailwind: boolean;
+  };
 }
 
 type CanvasActionType =
@@ -55,12 +59,18 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           };
         }
         case "SET": {
+          let encoder = state.debugger.encoder ?? new TextEncoder();
+          const utf8Input = Array.from(encoder.encode(action.payload));
           const tokens = state.lexer.tokenize(action.payload);
           const grid = griddify(tokens, state.config.stylesConfig);
           return {
             ...state,
             tokens,
             grid,
+            debugger: {
+              encoder: encoder,
+              input: utf8Input,
+            },
           };
         }
         case "RESTORE_SELECTION": {

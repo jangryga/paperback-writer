@@ -54,12 +54,24 @@ function Canvas(
         grid: { rows: [] },
         selection: null,
         config: props.canvasConfig ?? defaultConfig,
+        debugger: {
+          encoder: new TextEncoder(),
+          input: [],
+        },
       }}
     >
       {props.canvasConfig?.debugMode && (
         <>
           <DebugPanel />
-          <div className="flex gap-2"></div>
+          <div
+            // className="flex gap-2"
+            className="bg-red-200"
+            style={{
+              height: "50px",
+              width: "50px",
+              border: "1px solid black",
+            }}
+          ></div>
         </>
       )}
       <CanvasInner
