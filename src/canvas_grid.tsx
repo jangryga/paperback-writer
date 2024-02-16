@@ -2,7 +2,7 @@ import { TokenType } from "lexer-rs";
 import { renderElement } from "./canvas_renderer";
 import { CanvasConfigType } from "./canvas_context";
 
-interface GridRow {
+export interface GridRow {
   index: number;
   indent: number;
   elements: JSX.Element;

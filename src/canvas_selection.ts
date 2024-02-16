@@ -135,7 +135,6 @@ function restoreSelection(node: Node, prevSelNode: SelectionNode | null): void {
     "Nested selection out of range."
   );
   if (fakeEndNode.children![spanIdx].rangeMarker) {
-    console.warn("This only runs if content is not set.");
     const _node = realEndNode.childNodes[spanIdx];
     const _marker = fakeEndNode.children![spanIdx].rangeMarker;
     return setDOMRange(

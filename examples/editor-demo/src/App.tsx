@@ -9,15 +9,7 @@ config.debugMode = true;
 function App() {
   return (
     <div className="bg-gray-900 h-[100vh]">
-      <Canvas
-        canvasConfig={config}
-        style={{
-          width: "700px",
-          height: "500px",
-          border: "2px solid red",
-          backgroundColor: "",
-        }}
-      />
+      <Canvas canvasConfig={config} />
     </div>
   );
 }
