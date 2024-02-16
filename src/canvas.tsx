@@ -25,23 +25,21 @@ function CanvasInner({
   const ref = useRef<HTMLDivElement>(null);
 
   return (
-    <div>
-      <div
-        {...props}
-        ref={ref}
-        contentEditable
-        suppressContentEditableWarning
-        className="w-full h-full focus:outline-none"
-        onSelect={() => {
-          saveSelection(ref.current!);
-        }}
-        onInput={() => {
-          saveSelection(ref.current!);
-          updateEditorState(ref.current!.innerText);
-          restoreSelection(ref.current!);
-        }}
-      />
-    </div>
+    <div
+      {...props}
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      className="w-full h-full focus:outline-none"
+      onSelect={() => {
+        saveSelection(ref.current!);
+      }}
+      onInput={() => {
+        saveSelection(ref.current!);
+        updateEditorState(ref.current!.innerText);
+        restoreSelection(ref.current!);
+      }}
+    />
   );
 }
 
