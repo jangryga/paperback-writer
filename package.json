@@ -1,7 +1,7 @@
 {
   "name": "paperback-writer",
   "license": "MIT",
-  "version": "0.0.22",
+  "version": "0.0.24",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -39,10 +39,10 @@
     "./dist/index.css"
   ],
   "dependencies": {
-    "lexer-rs": "0.1.38"
+    "lexer-rs": "0.1.39"
   },
   "peerDependencies": {
-    "lexer-rs": "0.1.38",
+    "lexer-rs": "0.1.39",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   }
