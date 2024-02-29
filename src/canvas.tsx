@@ -78,7 +78,7 @@ function Canvas(
   return (
     <CanvasProvider
       initialContext={{
-        lexer: new LexerWrapper(true),
+        lexer: new LexerWrapper(props.canvasConfig?.debugMode),
         tokens: [],
         grid: { rows: [] },
         selection: null,

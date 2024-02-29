@@ -29,7 +29,7 @@ interface CanvasContextType {
 }
 
 export interface CanvasConfigType {
-  debugMode: Boolean;
+  debugMode: boolean;
   stylesConfig: {
     styles: Record<keyof typeof TokenCategory, string>;
     useTailwind: boolean;
@@ -61,6 +61,7 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           const selectionRow = action.payload.updateSelectionRow
             ? getCurrentSelectionRow(state.selection)
             : state.selectionRow;
+
           // const selectionRow = oldSelection && oldSelection.children && {
           //   index: oldSelection.children?.length,
           //   highlight

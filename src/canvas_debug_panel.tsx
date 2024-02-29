@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo, useEffect } from "react";
 import { useEditorContext } from "./canvas_context";
 import { TokenType } from "lexer-rs";
 import { SelectionNode } from "./canvas_selection";
@@ -52,8 +52,15 @@ function SelectionTab() {
   );
 }
 
-function SelectionList({ node }: { node: SelectionNode }) {
-  console.log("node: ", node);
+const SelectionList = memo(function SelectionList({
+  node,
+}: {
+  node: SelectionNode;
+}) {
+  useEffect(() => {
+    console.log("Node: ", node);
+  }, [node]);
+
   return null;
   return (
     <div>
@@ -69,13 +76,7 @@ function SelectionList({ node }: { node: SelectionNode }) {
       )}
     </div>
   );
-}
-
-function test(a: "a" | "b" | "c") {
-  return a;
-}
-
-let x = test();
+});
 
 function SelectionNodeFirstChild({ node }: { node: SelectionNode }) {
   if (node.value) return <div className="">{node.value}</div>;
