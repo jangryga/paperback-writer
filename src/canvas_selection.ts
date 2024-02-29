@@ -83,6 +83,20 @@ function saveSelection(element: HTMLElement) {
   return new SelectionNode(element, range);
 }
 
+export function getCurrentSelectionRow(selectionNode: SelectionNode | null): {
+  index: number | null;
+  highlightLine: boolean;
+} | null {
+  const selection = document.getSelection();
+  if (!selection || !selectionNode) return null;
+  const range = selection.getRangeAt(0);
+
+  return {
+    index: selectionNode.children!.length,
+    highlightLine: range.startContainer === range.endContainer,
+  };
+}
+
 /**
  * When there is a need for a reconciliation:
  * if there is an element <div><span>return</span></div>

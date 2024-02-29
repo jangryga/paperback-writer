@@ -14,7 +14,7 @@ interface Grid {
 
 function griddify(
   tokens: TokenType[],
-  CSSConfig: CanvasConfigType["stylesConfig"]
+  CSSConfig: CanvasConfigType["stylesConfig"],
 ): Grid {
   const grid: Grid = { rows: [] };
   let indent = 0;
@@ -62,8 +62,8 @@ function griddify(
               category: "Whitespace",
             },
             key,
-            CSSConfig
-          )
+            CSSConfig,
+          ),
         );
         continue;
       }

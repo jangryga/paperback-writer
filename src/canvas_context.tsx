@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Grid, griddify } from "./canvas_grid";
 import {
+  getCurrentSelectionRow,
   restoreSelection,
   saveSelection as saveSelectionInternal,
   type SelectionNode,
@@ -19,6 +20,7 @@ interface CanvasContextType {
   lexer: LexerWrapper;
   grid: Grid;
   selection: SelectionNode | null;
+  selectionRow: { index: number | null; highlightLine: boolean } | null;
   config: CanvasConfigType;
   debugger: {
     encoder: TextEncoder | null;
@@ -35,16 +37,19 @@ export interface CanvasConfigType {
 }
 
 type CanvasActionType =
-  | { type: "SET"; payload: string }
-  | { type: "SAVE_SELECTION"; payload: { element: HTMLDivElement } }
+  | { type: "SET"; payload: { text: string; element: HTMLDivElement } }
+  | {
+      type: "SAVE_SELECTION";
+      payload: { element: HTMLDivElement; updateSelectionRow: boolean };
+    }
   | { type: "RESTORE_SELECTION"; payload: { element: HTMLDivElement } }
   | { type: "SET_CONFIG"; payload: { config: CanvasConfigType } };
 type UseCanvasManagerResult = ReturnType<typeof useCanvasManager>;
 
 function useCanvasManager(initialCanvasContext: CanvasContextType): {
   context: CanvasContextType;
-  updateTree: (text: string) => void;
-  saveSelection: (element: HTMLDivElement) => void;
+  updateTree: (text: string, element: HTMLDivElement) => void;
+  saveSelection: (element: HTMLDivElement, updateSelectionRow: boolean) => void;
   restoreState: (element: HTMLDivElement) => void;
   setConfig: (config: CanvasConfigType) => void;
 } {
@@ -53,20 +58,30 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
       switch (action.type) {
         case "SAVE_SELECTION": {
           const oldSelection = saveSelectionInternal(action.payload.element);
+          const selectionRow = action.payload.updateSelectionRow
+            ? getCurrentSelectionRow(state.selection)
+            : state.selectionRow;
+          // const selectionRow = oldSelection && oldSelection.children && {
+          //   index: oldSelection.children?.length,
+          //   highlight
+          // }
           return {
             ...state,
+            selectionRow: selectionRow,
             selection: oldSelection,
           };
         }
         case "SET": {
           let encoder = state.debugger.encoder ?? new TextEncoder();
-          const utf8Input = Array.from(encoder.encode(action.payload));
-          const tokens = state.lexer.tokenize(action.payload);
+          const utf8Input = Array.from(encoder.encode(action.payload.text));
+          const tokens = state.lexer.tokenize(action.payload.text);
           const grid = griddify(tokens, state.config.stylesConfig);
+          const selectionRow = getCurrentSelectionRow(state.selection);
           return {
             ...state,
             tokens,
             grid,
+            selectionRow,
             debugger: {
               encoder: encoder,
               input: utf8Input,
@@ -76,7 +91,7 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
         case "RESTORE_SELECTION": {
           const element = action.payload.element;
           element.innerHTML = ReactDOMServer.renderToString(
-            <>{state.grid.rows.map((row) => row.elements)}</>
+            <>{state.grid.rows.map((row) => row.elements)}</>,
           );
           restoreSelection(element, state.selection);
           return { ...state };
@@ -88,16 +103,22 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           throw new Error("unimplemented");
       }
     },
-    initialCanvasContext
+    initialCanvasContext,
   );
 
-  const updateTree = useCallback((text: string) => {
-    dispatch({ type: "SET", payload: text });
+  const updateTree = useCallback((text: string, element: HTMLDivElement) => {
+    dispatch({ type: "SET", payload: { text, element } });
   }, []);
 
-  const saveSelection = useCallback((element: HTMLDivElement) => {
-    dispatch({ type: "SAVE_SELECTION", payload: { element } });
-  }, []);
+  const saveSelection = useCallback(
+    (element: HTMLDivElement, updateSelectionRow: boolean) => {
+      dispatch({
+        type: "SAVE_SELECTION",
+        payload: { element, updateSelectionRow },
+      });
+    },
+    [],
+  );
 
   const restoreState = useCallback((element: HTMLDivElement) => {
     dispatch({ type: "RESTORE_SELECTION", payload: { element } });

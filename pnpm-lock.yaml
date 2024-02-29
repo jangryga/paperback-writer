@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  lexer-rs:
+    specifier: 0.1.38
+    version: 0.1.38
   react:
     specifier: ^18.0.0
     version: 18.2.0
@@ -61,9 +64,6 @@ devDependencies:
   eslint-plugin-react-refresh:
     specifier: ^0.4.3
     version: 0.4.5(eslint@8.56.0)
-  lexer-rs:
-    specifier: 0.1.33
-    version: 0.1.33
   postcss:
     specifier: ^8.4.35
     version: 8.4.35
@@ -2015,9 +2015,9 @@ packages:
       type-check: 0.4.0
     dev: true
 
-  /lexer-rs@0.1.33:
-    resolution: {integrity: sha512-HCnQYZsz7m9qxj/ixdfefTPb7mNhJfKg2UwcZ4a65rUJ3ZIZNRxtjtFBmRir25AhdNPfRwcBF+rqEdvo3uRiHA==}
-    dev: true
+  /lexer-rs@0.1.38:
+    resolution: {integrity: sha512-BqQE/oTP4WifZjjJoiGcxXZEd71HxjlZaMW8onoer8hyP1RALndFwxB3aHwsbvtEo9i2OpJXWMpy01IR2vVpbQ==}
+    dev: false
 
   /lilconfig@2.1.0:
     resolution: {integrity: sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==}

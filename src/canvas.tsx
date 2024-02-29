@@ -37,11 +37,11 @@ function CanvasInner({
         suppressContentEditableWarning
         className="w-full h-full m-auto  bg-gray-800 focus:outline-none"
         onSelect={() => {
-          saveSelection(ref.current!);
+          saveSelection(ref.current!, true);
         }}
         onInput={() => {
-          saveSelection(ref.current!);
-          updateEditorState(ref.current!.innerText);
+          saveSelection(ref.current!, false);
+          updateEditorState(ref.current!.innerText, ref.current!);
           restoreSelection(ref.current!);
         }}
       />
@@ -56,15 +56,14 @@ const Sidebar = memo(function Sidebar({
   rows: GridRow[];
   current: number;
 }) {
-  // const lines: number[] = [];
-  // for (let i = 0; i < lineCount; i++) {
-  //   lines.push(i);
-  // }
   return (
-    <div className="w-[60px] bg-gray-800 flex flex-col items-center h-full">
-      <ul>
+    <div className="w-[60px] bg-gray-800 flex flex-col h-full">
+      <ul className="w-full">
         {rows.map((r) => (
-          <li key={r.index} className="text-gray-400">
+          <li
+            key={r.index}
+            className={`text-gray-400 ${current === r.index && "bg-gray-700"} text-center w-full`}
+          >
             {r.index + 1}
           </li>
         ))}
@@ -74,15 +73,16 @@ const Sidebar = memo(function Sidebar({
 });
 
 function Canvas(
-  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType }
+  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType },
 ) {
   return (
     <CanvasProvider
       initialContext={{
-        lexer: new LexerWrapper(),
+        lexer: new LexerWrapper(true),
         tokens: [],
         grid: { rows: [] },
         selection: null,
+        selectionRow: null,
         config: props.canvasConfig ?? defaultConfig,
         debugger: {
           encoder: new TextEncoder(),

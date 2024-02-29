@@ -7,8 +7,8 @@
 
 ### TODO:
 
-- [ ] strings + comments need fixing
 - [ ] add current line indicator
+- [ ] strings + comments need fixing
 - [ ] fix bug with extra lines being added
 - [ ] add tab support
 - [ ] indicate whitespace with special character

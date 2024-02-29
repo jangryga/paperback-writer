@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  paperback-writer:
+    specifier: link:/Users/mycs/Desktop/projects/paperback-writer
+    version: link:../..
   react:
     specifier: ^18.2.0
     version: 18.2.0

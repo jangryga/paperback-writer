@@ -39,10 +39,10 @@
     "./dist/index.css"
   ],
   "dependencies": {
-    "lexer-rs": "0.1.33"
+    "lexer-rs": "0.1.38"
   },
   "peerDependencies": {
-    "lexer-rs": "0.1.33",
+    "lexer-rs": "0.1.38",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   }
