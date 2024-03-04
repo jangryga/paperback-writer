@@ -92,7 +92,7 @@ export function getCurrentSelectionRow(selectionNode: SelectionNode | null): {
   const range = selection.getRangeAt(0);
 
   return {
-    index: selectionNode.children!.length,
+    index: selectionNode.children!.length - 1,
     highlightLine: range.startContainer === range.endContainer,
   };
 }

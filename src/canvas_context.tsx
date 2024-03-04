@@ -31,7 +31,10 @@ interface CanvasContextType {
 export interface CanvasConfigType {
   debugMode: boolean;
   stylesConfig: {
-    styles: Record<keyof typeof TokenCategory, string>;
+    styles: Record<
+      keyof typeof TokenCategory | "BgColor" | "BgHighlightColor",
+      string
+    >;
     useTailwind: boolean;
   };
 }
@@ -59,13 +62,8 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
         case "SAVE_SELECTION": {
           const oldSelection = saveSelectionInternal(action.payload.element);
           const selectionRow = action.payload.updateSelectionRow
-            ? getCurrentSelectionRow(state.selection)
+            ? getCurrentSelectionRow(oldSelection)
             : state.selectionRow;
-
-          // const selectionRow = oldSelection && oldSelection.children && {
-          //   index: oldSelection.children?.length,
-          //   highlight
-          // }
           return {
             ...state,
             selectionRow: selectionRow,
@@ -76,8 +74,12 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           let encoder = state.debugger.encoder ?? new TextEncoder();
           const utf8Input = Array.from(encoder.encode(action.payload.text));
           const tokens = state.lexer.tokenize(action.payload.text);
-          const grid = griddify(tokens, state.config.stylesConfig);
           const selectionRow = getCurrentSelectionRow(state.selection);
+          const grid = griddify(tokens, state.config.stylesConfig, {
+            idx: selectionRow?.index || null,
+            bgHighlightColor: state.config.stylesConfig.styles.BgHighlightColor,
+          });
+
           return {
             ...state,
             tokens,

@@ -17,14 +17,18 @@ export const defaultConfig: CanvasConfigType = {
       Whitespace: "#000000",
       Eof: "#000000",
       Comment: "#1cda10",
+      BgColor: "#10141c",
+      BgHighlightColor: "#4a5568",
     },
   },
 };
 
 export const defaultTailwindColors = Object.entries(
-  defaultConfig.stylesConfig.styles
+  defaultConfig.stylesConfig.styles,
 ).reduce((accumulator, [key, val]) => {
-  // @ts-ignore
-  accumulator[key] = `text-${val}`;
+  if (key !== "BgColor" && key !== "BgHighlightColor") {
+    // @ts-ignore
+    accumulator[key] = `text-${val}`;
+  }
   return accumulator;
 }, {}) as CanvasConfigType["stylesConfig"]["styles"];

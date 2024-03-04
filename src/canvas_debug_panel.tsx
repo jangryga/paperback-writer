@@ -1,4 +1,4 @@
-import { useState, memo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useEditorContext } from "./canvas_context";
 import { TokenType } from "lexer-rs";
 import { SelectionNode } from "./canvas_selection";
@@ -52,31 +52,27 @@ function SelectionTab() {
   );
 }
 
-const SelectionList = memo(function SelectionList({
-  node,
-}: {
-  node: SelectionNode;
-}) {
+function SelectionList({ node }: { node: SelectionNode }) {
   useEffect(() => {
     console.log("Node: ", node);
   }, [node]);
 
   return null;
-  return (
-    <div>
-      <span>{node.name.toLowerCase()}</span>
-      {node.children && node.children.length > 0 && (
-        <ul>
-          {node.children.map((n, idx) => (
-            <li key={idx} className="ml-4">
-              <SelectionNodeFirstChild node={n} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-});
+  // return (
+  //   <div>
+  //     <span>{node.name.toLowerCase()}</span>
+  //     {node.children && node.children.length > 0 && (
+  //       <ul>
+  //         {node.children.map((n, idx) => (
+  //           <li key={idx} className="ml-4">
+  //             <SelectionNodeFirstChild node={n} />
+  //           </li>
+  //         ))}
+  //       </ul>
+  //     )}
+  //   </div>
+  // );
+}
 
 function SelectionNodeFirstChild({ node }: { node: SelectionNode }) {
   if (node.value) return <div className="">{node.value}</div>;

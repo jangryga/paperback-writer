@@ -15,6 +15,7 @@ interface Grid {
 function griddify(
   tokens: TokenType[],
   CSSConfig: CanvasConfigType["stylesConfig"],
+  selection: { idx: number | null; bgHighlightColor: string },
 ): Grid {
   const grid: Grid = { rows: [] };
   let indent = 0;
@@ -34,7 +35,14 @@ function griddify(
         index,
         indent,
         elements: (
-          <div key={key}>
+          <div
+            key={key}
+            className={
+              index === selection.idx
+                ? `bg-[${selection.bgHighlightColor}]`
+                : ""
+            }
+          >
             {children.length === 0 && index > 0 ? [<br />] : children}
           </div>
         ),
@@ -44,7 +52,18 @@ function griddify(
       grid.rows.push({
         index,
         indent,
-        elements: <div key={key}>{elements}</div>,
+        elements: (
+          <div
+            key={key}
+            className={
+              index === selection.idx
+                ? `bg-[${selection.bgHighlightColor}]`
+                : ""
+            }
+          >
+            {elements}
+          </div>
+        ),
       });
       index += 1;
       children = [];
