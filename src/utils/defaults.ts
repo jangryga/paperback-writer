@@ -18,7 +18,7 @@ export const defaultConfig: CanvasConfigType = {
       Eof: "#000000",
       Comment: "#1cda10",
       BgColor: "#10141c",
-      BgHighlightColor: "#4a5568",
+      BgHighlightColor: "#1a202c",
     },
   },
 };

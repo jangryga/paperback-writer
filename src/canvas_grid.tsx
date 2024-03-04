@@ -37,11 +37,10 @@ function griddify(
         elements: (
           <div
             key={key}
-            className={
-              index === selection.idx
-                ? `bg-[${selection.bgHighlightColor}]`
-                : ""
-            }
+            style={{
+              backgroundColor:
+                index === selection.idx ? selection.bgHighlightColor : "",
+            }}
           >
             {children.length === 0 && index > 0 ? [<br />] : children}
           </div>
@@ -55,11 +54,10 @@ function griddify(
         elements: (
           <div
             key={key}
-            className={
-              index === selection.idx
-                ? `bg-[${selection.bgHighlightColor}]`
-                : ""
-            }
+            style={{
+              backgroundColor:
+                index === selection.idx ? selection.bgHighlightColor : "",
+            }}
           >
             {elements}
           </div>

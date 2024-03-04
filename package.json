@@ -10,7 +10,7 @@
     "build:watch": "tsup src/index.ts --format cjs,esm --dts --watch --ignore-watch examples",
     "dev": "concurrently \"pnpm build:watch\" \"pnpm -C ./examples/editor-demo dev\"",
     "lint": "tsc",
-    "tailwind": "pnpm tailwindcss -i ./src/global.css -o ./dist/global.css"
+    "tailwind": "tailwindcss -i ./src/index.css -o ./dist/index.css"
   },
   "devDependencies": {
     "@types/react": "^18.2.48",

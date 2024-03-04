@@ -34,7 +34,8 @@ function CanvasInner({
         ref={ref}
         contentEditable
         suppressContentEditableWarning
-        className={`w-full h-full m-auto bg-[${styles.BgColor}] focus:outline-none`}
+        className="w-full h-full m-auto focus:outline-none"
+        style={{ backgroundColor: styles.BgColor }}
         onSelect={() => {
           saveSelection(ref.current!, true);
         }}
@@ -50,18 +51,27 @@ function CanvasInner({
 
 function Sidebar() {
   const rows = useEditorContext().grid.rows;
-  const currentIndex = useEditorContext().selectionRow?.index ?? null;
+  const context = useEditorContext();
+  const currentIndex = context.selectionRow?.index ?? null;
+  const styles = context.config.stylesConfig.styles;
   useEffect(() => {
     console.log("index changed");
   }, [currentIndex]);
 
   return (
-    <div className="w-[60px] bg-gray-800 flex flex-col h-full">
+    <div
+      className="w-[60px] flex flex-col h-full"
+      style={{ backgroundColor: styles.BgColor }}
+    >
       <ul className="w-full">
         {rows.map((r) => (
           <li
             key={r.index}
-            className={`text-gray-400 ${currentIndex === r.index && "bg-gray-700"} text-center w-full`}
+            className="text-gray-400 text-center w-full"
+            style={{
+              backgroundColor:
+                currentIndex === r.index ? styles.BgHighlightColor : "",
+            }}
           >
             {r.index + 1}
           </li>
