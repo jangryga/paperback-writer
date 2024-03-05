@@ -54,9 +54,6 @@ function Sidebar() {
   const context = useEditorContext();
   const currentIndex = context.selectionRow?.index ?? null;
   const styles = context.config.stylesConfig.styles;
-  useEffect(() => {
-    console.log("index changed");
-  }, [currentIndex]);
 
   return (
     <div

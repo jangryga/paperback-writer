@@ -35,7 +35,6 @@ export interface CanvasConfigType {
       keyof typeof TokenCategory | "BgColor" | "BgHighlightColor",
       string
     >;
-    useTailwind: boolean;
   };
 }
 

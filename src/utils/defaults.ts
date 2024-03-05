@@ -3,7 +3,6 @@ import { CanvasConfigType } from "../canvas_context";
 export const defaultConfig: CanvasConfigType = {
   debugMode: false,
   stylesConfig: {
-    useTailwind: false,
     styles: {
       Keyword: "#7f1d1d",
       Dunder: "#6b7280",
