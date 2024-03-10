@@ -20,12 +20,40 @@ interface CanvasContextType {
   lexer: LexerWrapper;
   grid: Grid;
   selection: SelectionNode | null;
-  selectionRow: { index: number | null; highlightLine: boolean } | null;
+  selectionRow: { index: number | null; prevIndex: number | null };
   config: CanvasConfigType;
   debugger: {
     encoder: TextEncoder | null;
     input: number[];
   };
+}
+
+function highlightSelection(context: CanvasContextType) {
+  const curr = context.selectionRow.index;
+  const prev = context.selectionRow.prevIndex;
+  if (curr !== null) {
+    const currId = context.grid.rowIds[curr];
+    document.querySelectorAll(`.${currId}`).forEach((element) => {
+      if (element instanceof HTMLElement) {
+        element.style.setProperty(
+          "background-color",
+          context.config.stylesConfig.styles.BgHighlightColor,
+        );
+      }
+    });
+  }
+
+  if (prev !== null) {
+    const prevId = context.grid.rowIds[prev];
+    document.querySelectorAll(`.${prevId}`).forEach((element) => {
+      if (element instanceof HTMLElement) {
+        element.style.setProperty(
+          "background-color",
+          context.config.stylesConfig.styles.BgColor,
+        );
+      }
+    });
+  }
 }
 
 export interface CanvasConfigType {
@@ -60,24 +88,34 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
       switch (action.type) {
         case "SAVE_SELECTION": {
           const oldSelection = saveSelectionInternal(action.payload.element);
-          const selectionRow = action.payload.updateSelectionRow
+          const updateHighlight = action.payload.updateSelectionRow;
+          const newSelectionRowIdx = updateHighlight
             ? getCurrentSelectionRow(oldSelection)
-            : state.selectionRow;
-          return {
+            : state.selectionRow.index;
+
+          const selectionRow = {
+            index: newSelectionRowIdx,
+            prevIndex: state.selectionRow.index,
+          };
+
+          const newState = {
             ...state,
-            selectionRow: selectionRow,
+            selectionRow,
             selection: oldSelection,
           };
+
+          if (updateHighlight) highlightSelection(newState);
+          return newState;
         }
         case "SET": {
           let encoder = state.debugger.encoder ?? new TextEncoder();
           const utf8Input = Array.from(encoder.encode(action.payload.text));
           const tokens = state.lexer.tokenize(action.payload.text);
-          const selectionRow = getCurrentSelectionRow(state.selection);
-          const grid = griddify(tokens, state.config.stylesConfig, {
-            idx: selectionRow?.index || null,
-            bgHighlightColor: state.config.stylesConfig.styles.BgHighlightColor,
-          });
+          const selectionRow = {
+            index: getCurrentSelectionRow(state.selection),
+            prevIndex: state.selectionRow.index,
+          };
+          const grid = griddify(tokens, state.config.stylesConfig);
 
           return {
             ...state,
@@ -100,7 +138,6 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
         }
         case "SET_CONFIG":
           return { ...state, config: action.payload.config };
-
         default:
           throw new Error("unimplemented");
       }

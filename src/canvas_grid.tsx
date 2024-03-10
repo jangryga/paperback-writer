@@ -6,18 +6,19 @@ export interface GridRow {
   index: number;
   indent: number;
   elements: JSX.Element;
+  id: string;
 }
 
 interface Grid {
   rows: GridRow[];
+  rowIds: string[];
 }
 
 function griddify(
   tokens: TokenType[],
   CSSConfig: CanvasConfigType["stylesConfig"],
-  selection: { idx: number | null; bgHighlightColor: string },
 ): Grid {
-  const grid: Grid = { rows: [] };
+  const grid: Grid = { rows: [], rowIds: [] };
   let indent = 0;
   let index = 0;
 
@@ -28,40 +29,33 @@ function griddify(
 
   let children: JSX.Element[] = [];
   for (const [idx, token] of tokens.entries()) {
-    const key = `${index}-${children.length}-${idx}`;
+    const key = `key-${index}-${children.length}-${idx}`;
+
     if (token.kind === "Dedent") continue;
     if (token.kind === "Eof") {
+      grid.rowIds.push(key);
       grid.rows.push({
         index,
         indent,
         elements: (
-          <div
-            key={key}
-            style={{
-              backgroundColor:
-                index === selection.idx ? selection.bgHighlightColor : "",
-            }}
-          >
+          <div key={key} className={key}>
             {children.length === 0 && index > 0 ? [<br />] : children}
           </div>
         ),
+        id: key,
       });
     } else if (token.kind === "Newline") {
       const elements = children.length === 0 ? [<br />] : children;
+      grid.rowIds.push(key);
       grid.rows.push({
         index,
         indent,
         elements: (
-          <div
-            key={key}
-            style={{
-              backgroundColor:
-                index === selection.idx ? selection.bgHighlightColor : "",
-            }}
-          >
+          <div key={key} className={key}>
             {elements}
           </div>
         ),
+        id: key,
       });
       index += 1;
       children = [];

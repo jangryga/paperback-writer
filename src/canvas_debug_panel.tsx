@@ -30,11 +30,16 @@ function TextTab() {
 }
 
 function SelectionRowTab() {
-  const selectionRow = useEditorContext().selectionRow;
+  const context = useEditorContext();
+  const selectionRow = context.selectionRow;
+  const grid = context.grid;
   return (
     <div>
       <div>Selection row: {selectionRow?.index}</div>
-      <div>Highlight: {selectionRow?.highlightLine}</div>
+      <div>
+        element ids:
+        <span>{grid.rowIds.join(" | ")}</span>
+      </div>
     </div>
   );
 }
@@ -110,11 +115,13 @@ export function DebugPanel() {
           {tabs[tabIdx] === "Selection" && <SelectionTab />}
         </div>
         <ul className="col-span-1 overflow-y-auto max-h-[300px]">
-          {gridRows.map((row, idx) => (
-            <li key={idx} className="border border-red-900 mb-1">
-              {row.elements}
-            </li>
-          ))}
+          {gridRows.map((row, idx) => {
+            return (
+              <li key={idx} className="border border-red-900 mb-1">
+                {row.elements}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

@@ -83,18 +83,15 @@ function saveSelection(element: HTMLElement) {
   return new SelectionNode(element, range);
 }
 
-export function getCurrentSelectionRow(selectionNode: SelectionNode | null): {
-  index: number | null;
-  highlightLine: boolean;
-} | null {
+export function getCurrentSelectionRow(
+  selectionNode: SelectionNode | null,
+): number | null {
   const selection = document.getSelection();
   if (!selection || !selectionNode) return null;
-  const range = selection.getRangeAt(0);
+  return selectionNode.children!.length - 1;
 
-  return {
-    index: selectionNode.children!.length - 1,
-    highlightLine: range.startContainer === range.endContainer,
-  };
+  // TODO: dix multiline
+  // highlightLine: range.startContainer === range.endContainer,
 }
 
 /**

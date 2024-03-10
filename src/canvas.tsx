@@ -17,17 +17,33 @@ function CanvasInner({
   canvasConfig,
   ...props
 }: HTMLAttributes<HTMLDivElement> & { canvasConfig: CanvasConfigType }) {
-  useEffect(() => {
-    ref.current?.focus();
-  }, []);
   const updateEditorState = useUpdateUpdateEditorState();
   const saveSelection = useSaveEditorSelection();
   const restoreSelection = useRestoreSelection();
-  const styles = useEditorContext().config.stylesConfig.styles;
+  const context = useEditorContext();
+  const styles = context.config.stylesConfig.styles;
   const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.focus();
+    updateEditorState(ref.current!.innerText, ref.current!);
+    restoreSelection(ref.current!);
+
+    if (context.selectionRow.index !== null) {
+      const id = context.grid.rowIds[context.selectionRow.index];
+      console.log("id", id);
+      document.querySelectorAll(`.${id}`).forEach((element) => {
+        if (element instanceof HTMLElement) {
+          element.style.setProperty(
+            "background-color",
+            styles.BgHighlightColor,
+          );
+        }
+      });
+    }
+  }, []);
 
   return (
-    <div className="flex h-[500px] w-[700px] m-auto caret-gray-300">
+    <div className="flex h-[500px] w-[700px] m-auto caret-white">
       <Sidebar />
       <div
         {...props}
@@ -86,9 +102,9 @@ function Canvas(
       initialContext={{
         lexer: new LexerWrapper(props.canvasConfig?.debugMode),
         tokens: [],
-        grid: { rows: [] },
+        grid: { rows: [], rowIds: [] },
         selection: null,
-        selectionRow: null,
+        selectionRow: { index: 0, prevIndex: null },
         config: props.canvasConfig ?? defaultConfig,
         debugger: {
           encoder: new TextEncoder(),

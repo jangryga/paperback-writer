@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "build:watch": "tsup src/index.ts --format cjs,esm --dts --watch --ignore-watch examples",
-    "dev": "concurrently \"pnpm build:watch\" \"pnpm -C ./examples/editor-demo dev\"",
+    "dev": "concurrently \"yarn build:watch\" \"yarn --cwd ./examples/editor-demo dev\"",
     "lint": "tsc",
     "tailwind": "tailwindcss -i ./src/index.css -o ./dist/index.css"
   },
