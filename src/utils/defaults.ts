@@ -5,15 +5,15 @@ export const defaultConfig: CanvasConfigType = {
   debugMode: false,
   stylesConfig: {
     styles: {
-      Keyword: "#7f1d1d",
+      Keyword: "#ff9800",
       Dunder: "#6b7280",
       BuiltInType: "#000000",
       BuiltInFn: "#4ade80",
-      PunctuationAndGroup: "#eab308",
+      PunctuationAndGroup: "#bdbdbd",
       Operators: "#1d4ed8",
       Comparison: "#ea580c",
       Literal: "#d946ef",
-      Identifier: "#bdbdbd",
+      Identifier: "#03a9f4",
       Whitespace: "#000000",
       Eof: "#000000",
       Comment: "#1cda10",
@@ -24,7 +24,7 @@ export const defaultConfig: CanvasConfigType = {
 };
 
 export const defaultTailwindColors = Object.entries(
-  defaultConfig.stylesConfig.styles,
+  defaultConfig.stylesConfig.styles
 ).reduce((accumulator, [key, val]) => {
   if (key !== "BgColor" && key !== "BgHighlightColor") {
     // @ts-ignore

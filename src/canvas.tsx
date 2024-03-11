@@ -1,4 +1,4 @@
-import { HTMLAttributes, useEffect, useRef } from "react";
+import { HTMLAttributes, useEffect, useRef, useState } from "react";
 import {
   useUpdateUpdateEditorState,
   useSaveEditorSelection,
@@ -23,6 +23,8 @@ function CanvasInner({
   const context = useEditorContext();
   const styles = context.config.stylesConfig.styles;
   const ref = useRef<HTMLDivElement>(null);
+  const [mouseDown, setMouseDown] = useState(false);
+  const [removeHighlight, setRemoveHighlight] = useState(false);
   useEffect(() => {
     ref.current?.focus();
     updateEditorState(ref.current!.innerText, ref.current!);
@@ -42,10 +44,33 @@ function CanvasInner({
   }, []);
 
   return (
-    <div className="flex h-[500px] w-[700px] m-auto caret-white">
-      <Sidebar />
+    <div className="flex h-[500px] w-[700px] m-auto caret-white text-lg">
+      <Sidebar removeHighlight={removeHighlight} />
       <div
         {...props}
+        onMouseDown={() => setMouseDown(true)}
+        onMouseUp={() => {
+          setMouseDown(false);
+          setRemoveHighlight(false);
+        }}
+        onMouseMove={() => {
+          if (mouseDown) {
+            setRemoveHighlight(true);
+            if (!context.highlightRow.index) {
+              console.warn("Removing highlight but no highlight lol");
+            }
+            const highlightId =
+              context.grid.rowIds[context.highlightRow.index!];
+            document.querySelectorAll(`.${highlightId}`).forEach((element) => {
+              if (element instanceof HTMLElement) {
+                element.style.setProperty(
+                  "background-color",
+                  context.config.stylesConfig.styles.BgColor,
+                );
+              }
+            });
+          }
+        }}
         ref={ref}
         spellCheck={false}
         autoCapitalize="off"
@@ -67,10 +92,12 @@ function CanvasInner({
   );
 }
 
-function Sidebar() {
+function Sidebar({ removeHighlight }: { removeHighlight: boolean }) {
   const rows = useEditorContext().grid.rows;
   const context = useEditorContext();
-  const currentIndex = context.highlightRow?.index ?? null;
+  let currentIndex = context.highlightRow?.index ?? null;
+  if (removeHighlight) currentIndex = null;
+
   const styles = context.config.stylesConfig.styles;
 
   return (

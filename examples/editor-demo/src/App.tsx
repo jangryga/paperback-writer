@@ -3,7 +3,6 @@ import "paperback-writer/dist/index.css";
 import "./index.css";
 
 const config: CanvasConfigType = { ...defaultConfig };
-config.stylesConfig.styles.Identifier = "green";
 config.debugMode = true;
 
 function App() {

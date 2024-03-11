@@ -93,7 +93,6 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           const newHighlightRowIdx = updateHighlight
             ? getCurrentHighlightRow(oldSelection)
             : state.highlightRow.index;
-
           const highlightRow = {
             index: newHighlightRowIdx,
             prevIndex: state.highlightRow.index,
