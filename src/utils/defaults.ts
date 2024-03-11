@@ -1,4 +1,5 @@
 import { CanvasConfigType } from "../canvas_context";
+import {} from "lexer-rs";
 
 export const defaultConfig: CanvasConfigType = {
   debugMode: false,
@@ -12,7 +13,7 @@ export const defaultConfig: CanvasConfigType = {
       Operators: "#1d4ed8",
       Comparison: "#ea580c",
       Literal: "#d946ef",
-      Identifier: "#7f1d1d",
+      Identifier: "#bdbdbd",
       Whitespace: "#000000",
       Eof: "#000000",
       Comment: "#1cda10",

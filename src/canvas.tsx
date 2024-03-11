@@ -28,9 +28,8 @@ function CanvasInner({
     updateEditorState(ref.current!.innerText, ref.current!);
     restoreSelection(ref.current!);
 
-    if (context.selectionRow.index !== null) {
-      const id = context.grid.rowIds[context.selectionRow.index];
-      console.log("id", id);
+    if (context.highlightRow.index !== null) {
+      const id = context.grid.rowIds[context.highlightRow.index];
       document.querySelectorAll(`.${id}`).forEach((element) => {
         if (element instanceof HTMLElement) {
           element.style.setProperty(
@@ -48,6 +47,9 @@ function CanvasInner({
       <div
         {...props}
         ref={ref}
+        spellCheck={false}
+        autoCapitalize="off"
+        autoCorrect="off"
         contentEditable
         suppressContentEditableWarning
         className="w-full h-full m-auto focus:outline-none"
@@ -68,7 +70,7 @@ function CanvasInner({
 function Sidebar() {
   const rows = useEditorContext().grid.rows;
   const context = useEditorContext();
-  const currentIndex = context.selectionRow?.index ?? null;
+  const currentIndex = context.highlightRow?.index ?? null;
   const styles = context.config.stylesConfig.styles;
 
   return (
@@ -100,11 +102,11 @@ function Canvas(
   return (
     <CanvasProvider
       initialContext={{
-        lexer: new LexerWrapper(props.canvasConfig?.debugMode),
+        lexer: new LexerWrapper(false),
         tokens: [],
         grid: { rows: [], rowIds: [] },
         selection: null,
-        selectionRow: { index: 0, prevIndex: null },
+        highlightRow: { index: 0, prevIndex: null },
         config: props.canvasConfig ?? defaultConfig,
         debugger: {
           encoder: new TextEncoder(),

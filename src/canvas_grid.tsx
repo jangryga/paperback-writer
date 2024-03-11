@@ -17,6 +17,7 @@ interface Grid {
 function griddify(
   tokens: TokenType[],
   CSSConfig: CanvasConfigType["stylesConfig"],
+  highlight: { idx: number | null; highlightColor: string; bgColor: string },
 ): Grid {
   const grid: Grid = { rows: [], rowIds: [] };
   let indent = 0;
@@ -38,7 +39,15 @@ function griddify(
         index,
         indent,
         elements: (
-          <div key={key} className={key}>
+          <div
+            key={key}
+            className={key}
+            style={
+              highlight.idx && grid.rows.length === highlight.idx
+                ? { backgroundColor: highlight.highlightColor }
+                : {}
+            }
+          >
             {children.length === 0 && index > 0 ? [<br />] : children}
           </div>
         ),
@@ -51,7 +60,15 @@ function griddify(
         index,
         indent,
         elements: (
-          <div key={key} className={key}>
+          <div
+            key={key}
+            className={key}
+            style={
+              highlight.idx && grid.rows.length === highlight.idx
+                ? { backgroundColor: highlight.highlightColor }
+                : {}
+            }
+          >
             {elements}
           </div>
         ),

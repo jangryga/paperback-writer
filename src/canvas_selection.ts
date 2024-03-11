@@ -83,7 +83,7 @@ function saveSelection(element: HTMLElement) {
   return new SelectionNode(element, range);
 }
 
-export function getCurrentSelectionRow(
+export function getCurrentHighlightRow(
   selectionNode: SelectionNode | null,
 ): number | null {
   const selection = document.getSelection();

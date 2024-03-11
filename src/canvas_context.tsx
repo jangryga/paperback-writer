@@ -8,7 +8,7 @@ import {
 } from "react";
 import { Grid, griddify } from "./canvas_grid";
 import {
-  getCurrentSelectionRow,
+  getCurrentHighlightRow,
   restoreSelection,
   saveSelection as saveSelectionInternal,
   type SelectionNode,
@@ -20,7 +20,7 @@ interface CanvasContextType {
   lexer: LexerWrapper;
   grid: Grid;
   selection: SelectionNode | null;
-  selectionRow: { index: number | null; prevIndex: number | null };
+  highlightRow: { index: number | null; prevIndex: number | null };
   config: CanvasConfigType;
   debugger: {
     encoder: TextEncoder | null;
@@ -29,8 +29,9 @@ interface CanvasContextType {
 }
 
 function highlightSelection(context: CanvasContextType) {
-  const curr = context.selectionRow.index;
-  const prev = context.selectionRow.prevIndex;
+  const curr = context.highlightRow.index;
+  const prev = context.highlightRow.prevIndex;
+  if (curr === prev) return;
   if (curr !== null) {
     const currId = context.grid.rowIds[curr];
     document.querySelectorAll(`.${currId}`).forEach((element) => {
@@ -70,7 +71,7 @@ type CanvasActionType =
   | { type: "SET"; payload: { text: string; element: HTMLDivElement } }
   | {
       type: "SAVE_SELECTION";
-      payload: { element: HTMLDivElement; updateSelectionRow: boolean };
+      payload: { element: HTMLDivElement; updateHighlightRow: boolean };
     }
   | { type: "RESTORE_SELECTION"; payload: { element: HTMLDivElement } }
   | { type: "SET_CONFIG"; payload: { config: CanvasConfigType } };
@@ -79,7 +80,7 @@ type UseCanvasManagerResult = ReturnType<typeof useCanvasManager>;
 function useCanvasManager(initialCanvasContext: CanvasContextType): {
   context: CanvasContextType;
   updateTree: (text: string, element: HTMLDivElement) => void;
-  saveSelection: (element: HTMLDivElement, updateSelectionRow: boolean) => void;
+  saveSelection: (element: HTMLDivElement, updateHighlightRow: boolean) => void;
   restoreState: (element: HTMLDivElement) => void;
   setConfig: (config: CanvasConfigType) => void;
 } {
@@ -88,19 +89,19 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
       switch (action.type) {
         case "SAVE_SELECTION": {
           const oldSelection = saveSelectionInternal(action.payload.element);
-          const updateHighlight = action.payload.updateSelectionRow;
-          const newSelectionRowIdx = updateHighlight
-            ? getCurrentSelectionRow(oldSelection)
-            : state.selectionRow.index;
+          const updateHighlight = action.payload.updateHighlightRow;
+          const newHighlightRowIdx = updateHighlight
+            ? getCurrentHighlightRow(oldSelection)
+            : state.highlightRow.index;
 
-          const selectionRow = {
-            index: newSelectionRowIdx,
-            prevIndex: state.selectionRow.index,
+          const highlightRow = {
+            index: newHighlightRowIdx,
+            prevIndex: state.highlightRow.index,
           };
 
           const newState = {
             ...state,
-            selectionRow,
+            highlightRow,
             selection: oldSelection,
           };
 
@@ -111,17 +112,21 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           let encoder = state.debugger.encoder ?? new TextEncoder();
           const utf8Input = Array.from(encoder.encode(action.payload.text));
           const tokens = state.lexer.tokenize(action.payload.text);
-          const selectionRow = {
-            index: getCurrentSelectionRow(state.selection),
-            prevIndex: state.selectionRow.index,
+          const highlightRow = {
+            index: getCurrentHighlightRow(state.selection),
+            prevIndex: state.highlightRow.index,
           };
-          const grid = griddify(tokens, state.config.stylesConfig);
+          const grid = griddify(tokens, state.config.stylesConfig, {
+            idx: highlightRow.index,
+            bgColor: state.config.stylesConfig.styles.BgColor,
+            highlightColor: state.config.stylesConfig.styles.BgHighlightColor,
+          });
 
           return {
             ...state,
             tokens,
             grid,
-            selectionRow,
+            highlightRow,
             debugger: {
               encoder: encoder,
               input: utf8Input,
@@ -150,10 +155,10 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
   }, []);
 
   const saveSelection = useCallback(
-    (element: HTMLDivElement, updateSelectionRow: boolean) => {
+    (element: HTMLDivElement, updateHighlightRow: boolean) => {
       dispatch({
         type: "SAVE_SELECTION",
-        payload: { element, updateSelectionRow },
+        payload: { element, updateHighlightRow },
       });
     },
     [],

@@ -31,11 +31,11 @@ function TextTab() {
 
 function SelectionRowTab() {
   const context = useEditorContext();
-  const selectionRow = context.selectionRow;
+  const highlightRow = context.highlightRow;
   const grid = context.grid;
   return (
     <div>
-      <div>Selection row: {selectionRow?.index}</div>
+      <div>Selection row: {highlightRow?.index}</div>
       <div>
         element ids:
         <span>{grid.rowIds.join(" | ")}</span>
