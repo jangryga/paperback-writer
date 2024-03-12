@@ -28,32 +28,32 @@ interface CanvasContextType {
   };
 }
 
+export function setBackgroundColor(selector: string, color: string) {
+  document.querySelectorAll(selector).forEach((e) => {
+    if (e instanceof HTMLElement) {
+      e.style.setProperty("background-color", color);
+    }
+  });
+}
+
 function highlightSelection(context: CanvasContextType) {
   const curr = context.highlightRow.index;
   const prev = context.highlightRow.prevIndex;
+  const bgColor = context.config.stylesConfig.styles.BgColor;
+  const hhColor = context.config.stylesConfig.styles.BgHighlightColor;
+
   if (curr === prev) return;
+
   if (curr !== null) {
     const currId = context.grid.rowIds[curr];
-    document.querySelectorAll(`.${currId}`).forEach((element) => {
-      if (element instanceof HTMLElement) {
-        element.style.setProperty(
-          "background-color",
-          context.config.stylesConfig.styles.BgHighlightColor,
-        );
-      }
-    });
+    setBackgroundColor(`.${currId}`, hhColor);
+    setBackgroundColor(`#sidebar-${curr}`, hhColor);
   }
 
   if (prev !== null) {
     const prevId = context.grid.rowIds[prev];
-    document.querySelectorAll(`.${prevId}`).forEach((element) => {
-      if (element instanceof HTMLElement) {
-        element.style.setProperty(
-          "background-color",
-          context.config.stylesConfig.styles.BgColor,
-        );
-      }
-    });
+    setBackgroundColor(`.${prevId}`, bgColor);
+    setBackgroundColor(`#sidebar-${prev}`, bgColor);
   }
 }
 

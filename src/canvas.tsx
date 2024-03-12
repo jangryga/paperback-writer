@@ -1,4 +1,4 @@
-import { HTMLAttributes, useEffect, useRef, useState } from "react";
+import { HTMLAttributes, useEffect, useRef, useState, memo } from "react";
 import {
   useUpdateUpdateEditorState,
   useSaveEditorSelection,
@@ -6,6 +6,7 @@ import {
   CanvasProvider,
   CanvasConfigType,
   useEditorContext,
+  setBackgroundColor,
 } from "./canvas_context";
 import { LexerWrapper } from "lexer-rs";
 import { DebugPanel } from "./canvas_debug_panel";
@@ -24,7 +25,7 @@ function CanvasInner({
   const styles = context.config.stylesConfig.styles;
   const ref = useRef<HTMLDivElement>(null);
   const [mouseDown, setMouseDown] = useState(false);
-  const [removeHighlight, setRemoveHighlight] = useState(false);
+
   useEffect(() => {
     ref.current?.focus();
     updateEditorState(ref.current!.innerText, ref.current!);
@@ -32,41 +33,28 @@ function CanvasInner({
 
     if (context.highlightRow.index !== null) {
       const id = context.grid.rowIds[context.highlightRow.index];
-      document.querySelectorAll(`.${id}`).forEach((element) => {
-        if (element instanceof HTMLElement) {
-          element.style.setProperty(
-            "background-color",
-            styles.BgHighlightColor,
-          );
-        }
-      });
+      setBackgroundColor(`.${id}`, styles.BgHighlightColor);
     }
   }, []);
 
   return (
     <div className="flex h-[500px] w-[700px] m-auto caret-white text-lg">
-      <Sidebar removeHighlight={removeHighlight} />
+      {/* <Sidebar removeHighlight={removeHighlight} /> */}
+      <Sidebar />
       <div
         {...props}
         onMouseDown={() => setMouseDown(true)}
         onMouseUp={() => {
           setMouseDown(false);
-          setRemoveHighlight();
         }}
         onMouseMove={() => {
           if (mouseDown) {
-            setRemoveHighlight(true);
             if (!context.highlightRow.index) return;
             const highlightId =
               context.grid.rowIds[context.highlightRow.index!];
-            document.querySelectorAll(`.${highlightId}`).forEach((element) => {
-              if (element instanceof HTMLElement) {
-                element.style.setProperty(
-                  "background-color",
-                  context.config.stylesConfig.styles.BgColor,
-                );
-              }
-            });
+            const sidebarId = `#sidebar-${context.highlightRow.index!}`;
+            setBackgroundColor(sidebarId, styles.BgColor);
+            setBackgroundColor(`.${highlightId}`, styles.BgColor);
           }
         }}
         ref={ref}
@@ -90,14 +78,10 @@ function CanvasInner({
   );
 }
 
-function Sidebar({ removeHighlight }: { removeHighlight: boolean }) {
+const Sidebar = memo(function Sidebar() {
   const rows = useEditorContext().grid.rows;
   const context = useEditorContext();
-  let currIndex = context.highlightRow?.index ?? null;
-  // let prevIndex = context.highlightRow.prevIndex;
-  console.log(context.highlightRow);
-  if (removeHighlight) currIndex = null;
-
+  const currIndex = context.highlightRow?.index ?? null;
   const styles = context.config.stylesConfig.styles;
 
   return (
@@ -110,6 +94,7 @@ function Sidebar({ removeHighlight }: { removeHighlight: boolean }) {
           <li
             key={r.index}
             className="text-gray-400 text-center w-full"
+            id={`sidebar-${r.index}`}
             style={{
               backgroundColor:
                 currIndex === r.index ? styles.BgHighlightColor : "",
@@ -121,7 +106,7 @@ function Sidebar({ removeHighlight }: { removeHighlight: boolean }) {
       </ul>
     </div>
   );
-}
+});
 
 function Canvas(
   props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType },
