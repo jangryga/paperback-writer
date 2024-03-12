@@ -51,14 +51,12 @@ function CanvasInner({
         onMouseDown={() => setMouseDown(true)}
         onMouseUp={() => {
           setMouseDown(false);
-          setRemoveHighlight(false);
+          setRemoveHighlight();
         }}
         onMouseMove={() => {
           if (mouseDown) {
             setRemoveHighlight(true);
-            if (!context.highlightRow.index) {
-              console.warn("Removing highlight but no highlight lol");
-            }
+            if (!context.highlightRow.index) return;
             const highlightId =
               context.grid.rowIds[context.highlightRow.index!];
             document.querySelectorAll(`.${highlightId}`).forEach((element) => {
@@ -95,8 +93,10 @@ function CanvasInner({
 function Sidebar({ removeHighlight }: { removeHighlight: boolean }) {
   const rows = useEditorContext().grid.rows;
   const context = useEditorContext();
-  let currentIndex = context.highlightRow?.index ?? null;
-  if (removeHighlight) currentIndex = null;
+  let currIndex = context.highlightRow?.index ?? null;
+  // let prevIndex = context.highlightRow.prevIndex;
+  console.log(context.highlightRow);
+  if (removeHighlight) currIndex = null;
 
   const styles = context.config.stylesConfig.styles;
 
@@ -112,7 +112,7 @@ function Sidebar({ removeHighlight }: { removeHighlight: boolean }) {
             className="text-gray-400 text-center w-full"
             style={{
               backgroundColor:
-                currentIndex === r.index ? styles.BgHighlightColor : "",
+                currIndex === r.index ? styles.BgHighlightColor : "",
             }}
           >
             {r.index + 1}
