@@ -74,7 +74,8 @@ type CanvasActionType =
       payload: { element: HTMLDivElement; updateHighlightRow: boolean };
     }
   | { type: "RESTORE_SELECTION"; payload: { element: HTMLDivElement } }
-  | { type: "SET_CONFIG"; payload: { config: CanvasConfigType } };
+  | { type: "SET_CONFIG"; payload: { config: CanvasConfigType } }
+  | { type: "INIT" };
 type UseCanvasManagerResult = ReturnType<typeof useCanvasManager>;
 
 function useCanvasManager(initialCanvasContext: CanvasContextType): {
@@ -83,6 +84,7 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
   saveSelection: (element: HTMLDivElement, updateHighlightRow: boolean) => void;
   restoreState: (element: HTMLDivElement) => void;
   setConfig: (config: CanvasConfigType) => void;
+  initState: () => void;
 } {
   const [context, dispatch] = useReducer(
     (state: CanvasContextType, action: CanvasActionType) => {
@@ -140,6 +142,17 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           restoreSelection(element, state.selection);
           return { ...state };
         }
+        case "INIT": {
+          const selection = document.getSelection();
+          const firstNode = selection?.anchorNode?.firstChild;
+          const range = new Range();
+          console.log(firstNode);
+          range.setStart(firstNode!, 0);
+          range.setEnd(firstNode!, 0);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          return { ...state };
+        }
         case "SET_CONFIG":
           return { ...state, config: action.payload.config };
         default:
@@ -171,7 +184,18 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
     dispatch({ type: "SET_CONFIG", payload: { config } });
   }, []);
 
-  return { context, updateTree, saveSelection, restoreState, setConfig };
+  const initState = useCallback(() => {
+    dispatch({ type: "INIT" });
+  }, []);
+
+  return {
+    context,
+    updateTree,
+    saveSelection,
+    restoreState,
+    setConfig,
+    initState,
+  };
 }
 
 const CanvasContext = createContext<UseCanvasManagerResult>({
@@ -180,6 +204,7 @@ const CanvasContext = createContext<UseCanvasManagerResult>({
   saveSelection: () => {},
   restoreState: () => {},
   setConfig: () => {},
+  initState: () => {},
 });
 
 export const CanvasProvider = ({
@@ -220,4 +245,9 @@ export const useRestoreSelection =
 export const useSetCanvasConfig = (): UseCanvasManagerResult["setConfig"] => {
   const { setConfig } = useContext(CanvasContext);
   return setConfig;
+};
+
+export const useInitState = (): UseCanvasManagerResult["initState"] => {
+  const { initState } = useContext(CanvasContext);
+  return initState;
 };

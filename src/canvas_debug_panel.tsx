@@ -5,6 +5,60 @@ import { SelectionNode } from "./canvas_selection";
 
 const tabs = ["Text", "Selection", "Selection Row"];
 
+export function DebugPanel() {
+  const context = useEditorContext();
+  const gridRows = context.grid.rows;
+  const [tabIdx, setTabIdx] = useState(0);
+
+  function downloadState() {
+    const jsonString = JSON.stringify(context);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "editor_state.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div className="text-gray-300">
+      <div className="flex justify-between w-full px-2">
+        <p className="text-gray-400">Debug view</p>
+        <div className="flex gap-3">
+          {tabs.map((tabName, index) => (
+            <button key={tabName} onClick={() => setTabIdx(index)}>
+              {tabName}
+            </button>
+          ))}
+        </div>
+        <div className="ml-14 flex gap-3">
+          <button onClick={downloadState}>Download state</button>
+          <button>Upload state</button>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 border border-[#383838] mb-2 h-[300px]">
+        <div className="border-r border-[#383838] col-span-1">
+          {tabs[tabIdx] === "Text" && <TextTab />}
+          {tabs[tabIdx] === "Selection Row" && <SelectionRowTab />}
+          {tabs[tabIdx] === "Selection" && <SelectionTab />}
+        </div>
+        <ul className="col-span-1 overflow-y-auto max-h-[300px]">
+          {gridRows.map((row, idx) => {
+            return (
+              <li key={idx} className="border border-red-900 mb-1">
+                {row.elements}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 function TextTab() {
   const context = useEditorContext();
   const tokens = context.tokens;
@@ -79,54 +133,16 @@ function SelectionList({ node }: { node: SelectionNode }) {
   // );
 }
 
-function SelectionNodeFirstChild({ node }: { node: SelectionNode }) {
-  if (node.value) return <div className="">{node.value}</div>;
-  return (
-    <span>
-      {`<${node.name.toLowerCase()}>`}
-      {/* {<SelectionNodeFirstChild node={} />} */}
-      {`</${node.name.toLowerCase()}>`}
-    </span>
-  );
-}
-
-export function DebugPanel() {
-  const context = useEditorContext();
-  const gridRows = context.grid.rows;
-  const [tabIdx, setTabIdx] = useState(0);
-
-  return (
-    <div className="text-gray-300">
-      <div className="flex">
-        <p className="mr-6">Debug view</p>
-        <div className="flex gap-2">
-          {tabs.map((tabName, index) => (
-            <button key={tabName} onClick={() => setTabIdx(index)}>
-              {tabName}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 border border-[#383838] mb-2 h-[300px]">
-        <div className="border-r border-[#383838] col-span-1">
-          {tabs[tabIdx] === "Text" && <TextTab />}
-          {tabs[tabIdx] === "Selection Row" && <SelectionRowTab />}
-          {tabs[tabIdx] === "Selection" && <SelectionTab />}
-        </div>
-        <ul className="col-span-1 overflow-y-auto max-h-[300px]">
-          {gridRows.map((row, idx) => {
-            return (
-              <li key={idx} className="border border-red-900 mb-1">
-                {row.elements}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </div>
-  );
-}
+// function SelectionNodeFirstChild({ node }: { node: SelectionNode }) {
+//   if (node.value) return <div className="">{node.value}</div>;
+//   return (
+//     <span>
+//       {`<${node.name.toLowerCase()}>`}
+//       {/* {<SelectionNodeFirstChild node={} />} */}
+//       {`</${node.name.toLowerCase()}>`}
+//     </span>
+//   );
+// }
 
 function batchTokenLines(tokens: TokenType[]): TokenType[][] {
   const elements: TokenType[][] = [];

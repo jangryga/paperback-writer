@@ -31,6 +31,7 @@ function griddify(
   let children: JSX.Element[] = [];
   for (const [idx, token] of tokens.entries()) {
     const key = `key-${index}-${children.length}-${idx}`;
+    // console.log("griddify", highlight);
 
     if (token.kind === "Dedent") continue;
     if (token.kind === "Eof") {

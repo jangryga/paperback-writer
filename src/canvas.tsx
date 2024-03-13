@@ -7,6 +7,7 @@ import {
   CanvasConfigType,
   useEditorContext,
   setBackgroundColor,
+  useInitState,
 } from "./canvas_context";
 import { LexerWrapper } from "lexer-rs";
 import { DebugPanel } from "./canvas_debug_panel";
@@ -21,21 +22,32 @@ function CanvasInner({
   const updateEditorState = useUpdateUpdateEditorState();
   const saveSelection = useSaveEditorSelection();
   const restoreSelection = useRestoreSelection();
+  const initState = useInitState();
   const context = useEditorContext();
   const styles = context.config.stylesConfig.styles;
   const ref = useRef<HTMLDivElement>(null);
   const [mouseDown, setMouseDown] = useState(false);
+  const [firstRenderComplete, setFirstRenderComplete] = useState(false);
 
   useEffect(() => {
     ref.current?.focus();
-    updateEditorState(ref.current!.innerText, ref.current!);
+    saveSelection(ref.current!, false);
+    updateEditorState(" ", ref.current!);
     restoreSelection(ref.current!);
-
-    if (context.highlightRow.index !== null) {
-      const id = context.grid.rowIds[context.highlightRow.index];
-      setBackgroundColor(`.${id}`, styles.BgHighlightColor);
-    }
+    setFirstRenderComplete(true);
   }, []);
+
+  useEffect(() => {
+    if (firstRenderComplete) {
+      initState();
+      updateEditorState("", ref.current!);
+
+      if (context.highlightRow.index !== null) {
+        const id = context.grid.rowIds[context.highlightRow.index];
+        setBackgroundColor(`.${id}`, styles.BgHighlightColor);
+      }
+    }
+  }, [firstRenderComplete]);
 
   return (
     <div className="flex h-[500px] w-[700px] m-auto caret-white text-lg">
@@ -114,7 +126,7 @@ function Canvas(
   return (
     <CanvasProvider
       initialContext={{
-        lexer: new LexerWrapper(false),
+        lexer: new LexerWrapper(true),
         tokens: [],
         grid: { rows: [], rowIds: [] },
         selection: null,
