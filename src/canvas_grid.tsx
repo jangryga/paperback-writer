@@ -17,7 +17,7 @@ interface Grid {
 function griddify(
   tokens: TokenType[],
   CSSConfig: CanvasConfigType["stylesConfig"],
-  highlight: { idx: number | null; highlightColor: string; bgColor: string },
+  highlight: { idx: number | null; highlightColor: string; bgColor: string }
 ): Grid {
   const grid: Grid = { rows: [], rowIds: [] };
   let indent = 0;
@@ -31,10 +31,15 @@ function griddify(
   let children: JSX.Element[] = [];
   for (const [idx, token] of tokens.entries()) {
     const key = `key-${index}-${children.length}-${idx}`;
-    // console.log("griddify", highlight);
 
     if (token.kind === "Dedent") continue;
     if (token.kind === "Eof") {
+      const uuh =
+        children.length === 0
+          ? index === 0
+            ? [<span className="init-xwawea23">&#8203;</span>]
+            : [<br />]
+          : children;
       grid.rowIds.push(key);
       grid.rows.push({
         index,
@@ -49,7 +54,7 @@ function griddify(
                 : {}
             }
           >
-            {children.length === 0 && index > 0 ? [<br />] : children}
+            {uuh}
           </div>
         ),
         id: key,
@@ -91,8 +96,8 @@ function griddify(
               category: "Whitespace",
             },
             key,
-            CSSConfig,
-          ),
+            CSSConfig
+          )
         );
         continue;
       }

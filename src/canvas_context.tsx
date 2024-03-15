@@ -15,7 +15,7 @@ import {
 } from "./canvas_selection";
 import ReactDOMServer from "react-dom/server";
 
-interface CanvasContextType {
+export interface CanvasContextType {
   tokens: TokenType[];
   lexer: LexerWrapper;
   grid: Grid;
@@ -113,6 +113,13 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           let encoder = state.debugger.encoder ?? new TextEncoder();
           const utf8Input = Array.from(encoder.encode(action.payload.text));
           const tokens = state.lexer.tokenize(action.payload.text);
+          // if (tokens.length === 1) {
+          //   tokens.push({
+          //     kind: "Whitespace",
+          //     value: "0",
+          //     category: "Whitespace",
+          //   });
+          // }
           const highlightRow = {
             index: getCurrentHighlightRow(state.selection),
             prevIndex: state.highlightRow.index,
@@ -137,7 +144,7 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
         case "RESTORE_SELECTION": {
           const element = action.payload.element;
           element.innerHTML = ReactDOMServer.renderToString(
-            <>{state.grid.rows.map((row) => row.elements)}</>,
+            <>{state.grid.rows.map((row) => row.elements)}</>
           );
           restoreSelection(element, state.selection);
           return { ...state };
@@ -146,7 +153,6 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           const selection = document.getSelection();
           const firstNode = selection?.anchorNode?.firstChild;
           const range = new Range();
-          console.log(firstNode);
           range.setStart(firstNode!, 0);
           range.setEnd(firstNode!, 0);
           selection?.removeAllRanges();
@@ -159,7 +165,7 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           throw new Error("unimplemented");
       }
     },
-    initialCanvasContext,
+    initialCanvasContext
   );
 
   const updateTree = useCallback((text: string, element: HTMLDivElement) => {
@@ -173,7 +179,7 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
         payload: { element, updateHighlightRow },
       });
     },
-    [],
+    []
   );
 
   const restoreState = useCallback((element: HTMLDivElement) => {

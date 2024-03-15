@@ -7,13 +7,13 @@ import {
   CanvasConfigType,
   useEditorContext,
   setBackgroundColor,
-  useInitState,
 } from "./canvas_context";
 import { LexerWrapper } from "lexer-rs";
 import { DebugPanel } from "./canvas_debug_panel";
 import { defaultConfig } from "./utils/defaults";
 
 import "./index.css";
+import { setDOMRange } from "./canvas_selection";
 
 function CanvasInner({
   canvasConfig,
@@ -22,7 +22,7 @@ function CanvasInner({
   const updateEditorState = useUpdateUpdateEditorState();
   const saveSelection = useSaveEditorSelection();
   const restoreSelection = useRestoreSelection();
-  const initState = useInitState();
+  // const initState = useInitState();
   const context = useEditorContext();
   const styles = context.config.stylesConfig.styles;
   const ref = useRef<HTMLDivElement>(null);
@@ -32,26 +32,33 @@ function CanvasInner({
   useEffect(() => {
     ref.current?.focus();
     saveSelection(ref.current!, false);
-    updateEditorState(" ", ref.current!);
+    updateEditorState("", ref.current!);
     restoreSelection(ref.current!);
     setFirstRenderComplete(true);
   }, []);
 
   useEffect(() => {
     if (firstRenderComplete) {
-      initState();
       updateEditorState("", ref.current!);
 
       if (context.highlightRow.index !== null) {
         const id = context.grid.rowIds[context.highlightRow.index];
         setBackgroundColor(`.${id}`, styles.BgHighlightColor);
       }
+
+      const elements = document.getElementsByClassName("init-xwawea23");
+      if (elements.length === 0) {
+        console.warn("first child element not found");
+      } else if (elements.length === 1) {
+        setDOMRange(elements[0], elements[0], 0, 0);
+      } else {
+        setDOMRange(elements[1], elements[1], 0, 0);
+      }
     }
   }, [firstRenderComplete]);
 
   return (
     <div className="flex h-[500px] w-[700px] m-auto caret-white text-lg">
-      {/* <Sidebar removeHighlight={removeHighlight} /> */}
       <Sidebar />
       <div
         {...props}
@@ -121,7 +128,7 @@ const Sidebar = memo(function Sidebar() {
 });
 
 function Canvas(
-  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType },
+  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType }
 ) {
   return (
     <CanvasProvider

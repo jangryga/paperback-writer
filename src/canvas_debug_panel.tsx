@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import { useEditorContext } from "./canvas_context";
 import { TokenType } from "lexer-rs";
 import { SelectionNode } from "./canvas_selection";
+import { SuperJSON } from "superjson";
 
 const tabs = ["Text", "Selection", "Selection Row"];
+
+// function encodeState(context: object, level: number) {
+//   d
+// }
 
 export function DebugPanel() {
   const context = useEditorContext();
@@ -11,12 +16,23 @@ export function DebugPanel() {
   const [tabIdx, setTabIdx] = useState(0);
 
   function downloadState() {
-    const jsonString = JSON.stringify(context);
+    const jsonString = SuperJSON.stringify({
+      state: {
+        selection: context.selection,
+        tokens: context.tokens,
+        highlightRow: context.highlightRow,
+        config: context.config,
+        debugger: {
+          encoder: null,
+          input: [],
+        },
+      },
+    });
     const blob = new Blob([jsonString], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "editor_state.json";
+    link.download = `editor_state-${new Date().valueOf()}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -112,9 +128,9 @@ function SelectionTab() {
 }
 
 function SelectionList({ node }: { node: SelectionNode }) {
-  useEffect(() => {
-    console.log("Node: ", node);
-  }, [node]);
+  // useEffect(() => {
+  //   console.log("Node: ", node);
+  // }, [node]);
 
   return null;
   // return (
