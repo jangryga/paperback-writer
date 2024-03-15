@@ -84,12 +84,13 @@ function saveSelection(element: HTMLElement) {
 }
 
 export function getCurrentHighlightRow(
-  selectionNode: SelectionNode | null
+  selectionNode: SelectionNode | null,
 ): number | null {
   const selection = document.getSelection();
   if (!selection || !selectionNode) return null;
   const range = selection.getRangeAt(0);
   if (range.startContainer !== range.endContainer) return null;
+  if (selectionNode.children?.length === 0) return 0;
   return selectionNode.children!.length - 1;
 }
 
@@ -128,21 +129,21 @@ function restoreSelection(node: Node, prevSelNode: SelectionNode | null): void {
       realEndNode,
       realEndNode,
       fakeEndNode.rangeMarker.rangeStartOffset!,
-      fakeEndNode.rangeMarker.rangeEndOffset!
+      fakeEndNode.rangeMarker.rangeEndOffset!,
     );
   }
   invariant(
     typeof fakeEndNode.children !== undefined,
-    "Expected children elements."
+    "Expected children elements.",
   );
   const spanIdx = fakeEndNode.children!.length - 1;
   invariant(
     fakeEndNode.children![spanIdx].containsEnd(),
-    "Expected nested range end."
+    "Expected nested range end.",
   );
   invariant(
     realEndNode.childNodes.length >= spanIdx,
-    "Nested selection out of range."
+    "Nested selection out of range.",
   );
   if (fakeEndNode.children![spanIdx].rangeMarker) {
     const _node = realEndNode.childNodes[spanIdx];
@@ -151,7 +152,7 @@ function restoreSelection(node: Node, prevSelNode: SelectionNode | null): void {
       _node,
       _node,
       _marker?.rangeStartOffset!,
-      _marker?.rangeEndOffset!
+      _marker?.rangeEndOffset!,
     );
   }
   const spanNode = realEndNode.childNodes[spanIdx];
@@ -161,13 +162,13 @@ function restoreSelection(node: Node, prevSelNode: SelectionNode | null): void {
     fakeEndNode.children![spanIdx].children![0].rangeMarker;
   invariant(
     textRangeMarker !== undefined,
-    "Expected textRangeMarker to be defined."
+    "Expected textRangeMarker to be defined.",
   );
   if (textRangeMarker?.rangeEndOffset! > (textNode as Text).length) {
     console.warn("Saved offset greater than text length. Walking up the tree.");
     invariant(
       realEndNode.childNodes.length > spanIdx + 1,
-      "[Reconciliation error] Expected extra child node on row <div>."
+      "[Reconciliation error] Expected extra child node on row <div>.",
     );
     const nextSpanNode = realEndNode.childNodes[spanIdx + 1];
     const nextTextNode = nextSpanNode.childNodes[0];
@@ -178,7 +179,7 @@ function restoreSelection(node: Node, prevSelNode: SelectionNode | null): void {
     textNode,
     textNode,
     textRangeMarker?.rangeStartOffset!,
-    textRangeMarker?.rangeEndOffset!
+    textRangeMarker?.rangeEndOffset!,
   );
 }
 
@@ -186,7 +187,7 @@ function setDOMRange(
   nodeStart: Node,
   nodeEnd: Node,
   offsetStart: number,
-  offsetEnd: number
+  offsetEnd: number,
 ): void {
   const domSelection = document.getSelection();
   const range = new Range();

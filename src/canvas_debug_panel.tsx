@@ -1,14 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useEditorContext } from "./canvas_context";
 import { TokenType } from "lexer-rs";
 import { SelectionNode } from "./canvas_selection";
 import { SuperJSON } from "superjson";
 
 const tabs = ["Text", "Selection", "Selection Row"];
-
-// function encodeState(context: object, level: number) {
-//   d
-// }
 
 export function DebugPanel() {
   const context = useEditorContext();
@@ -52,7 +48,6 @@ export function DebugPanel() {
         </div>
         <div className="ml-14 flex gap-3">
           <button onClick={downloadState}>Download state</button>
-          <button>Upload state</button>
         </div>
       </div>
       <div className="grid grid-cols-2 border border-[#383838] mb-2 h-[300px]">

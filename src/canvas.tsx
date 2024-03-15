@@ -39,20 +39,9 @@ function CanvasInner({
 
   useEffect(() => {
     if (firstRenderComplete) {
-      updateEditorState("", ref.current!);
-
       if (context.highlightRow.index !== null) {
         const id = context.grid.rowIds[context.highlightRow.index];
         setBackgroundColor(`.${id}`, styles.BgHighlightColor);
-      }
-
-      const elements = document.getElementsByClassName("init-xwawea23");
-      if (elements.length === 0) {
-        console.warn("first child element not found");
-      } else if (elements.length === 1) {
-        setDOMRange(elements[0], elements[0], 0, 0);
-      } else {
-        setDOMRange(elements[1], elements[1], 0, 0);
       }
     }
   }, [firstRenderComplete]);
@@ -85,6 +74,7 @@ function CanvasInner({
         className="w-full h-full m-auto focus:outline-none"
         style={{ backgroundColor: styles.BgColor }}
         onSelect={() => {
+          console.log("run");
           saveSelection(ref.current!, true);
         }}
         onInput={() => {
@@ -128,7 +118,7 @@ const Sidebar = memo(function Sidebar() {
 });
 
 function Canvas(
-  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType }
+  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType },
 ) {
   return (
     <CanvasProvider
