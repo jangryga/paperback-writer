@@ -1,6 +1,8 @@
 import { CanvasConfigType } from "../canvas_context";
 import {} from "lexer-rs";
 
+export const BASE_SPAN_ID = "init-xwawea23";
+
 export const defaultConfig: CanvasConfigType = {
   debugMode: false,
   stylesConfig: {

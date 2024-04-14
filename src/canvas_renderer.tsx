@@ -9,6 +9,7 @@ export function renderElement(
 ) {
   const textColor =
     CSSConfig.styles[token.category as keyof typeof TokenCategory];
+
   switch (TokenKind[token.kind as keyof typeof TokenKind]) {
     case 1: {
       console.error("Dedent detected");
@@ -24,12 +25,7 @@ export function renderElement(
       return <span key={key} />;
     case 188 /* Identity */:
       return (
-        <span
-          {...(CSSConfig.useTailwind
-            ? { className: textColor }
-            : { style: { color: textColor } })}
-          key={key}
-        >
+        <span style={{ color: textColor }} key={key}>
           {token.value}
         </span>
       );
@@ -41,12 +37,7 @@ export function renderElement(
       );
     default:
       return (
-        <span
-          {...(CSSConfig.useTailwind
-            ? { className: textColor }
-            : { style: { color: textColor } })}
-          key={key}
-        >
+        <span style={{ color: textColor }} key={key}>
           {tokenLookup(TokenKind[token.kind as keyof typeof TokenKind])}
         </span>
       );

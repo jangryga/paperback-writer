@@ -12,14 +12,15 @@ export interface GridRow {
 interface Grid {
   rows: GridRow[];
   rowIds: string[];
+  isEmpty: boolean;
 }
 
 function griddify(
   tokens: TokenType[],
   CSSConfig: CanvasConfigType["stylesConfig"],
-  highlight: { idx: number | null; highlightColor: string; bgColor: string },
+  highlight: { idx: number | null; highlightColor: string; bgColor: string }
 ): Grid {
-  const grid: Grid = { rows: [], rowIds: [] };
+  const grid: Grid = { rows: [], rowIds: [], isEmpty: false };
   let indent = 0;
   let index = 0;
 
@@ -34,11 +35,19 @@ function griddify(
 
     if (token.kind === "Dedent") continue;
     if (token.kind === "Eof") {
-      const uuh =
+      if (index === 0 && children.length === 0) {
+        grid.isEmpty = true;
+      }
+      const innerElements =
         children.length === 0
           ? index === 0
-            ? [<span className="init-xwawea23">&#8203;</span>]
-            : [<br />]
+            ? [
+                <span className="init-xwawea23" key="key-span">
+                  &#8203;
+                </span>,
+              ]
+            : // todo: does this every run?
+              [<br key="key-br-1" />]
           : children;
       grid.rowIds.push(key);
       grid.rows.push({
@@ -54,13 +63,14 @@ function griddify(
                 : {}
             }
           >
-            {uuh}
+            {innerElements}
           </div>
         ),
         id: key,
       });
     } else if (token.kind === "Newline") {
-      const elements = children.length === 0 ? [<br />] : children;
+      const elements =
+        children.length === 0 ? [<br key="key-br-2" />] : children;
       grid.rowIds.push(key);
       grid.rows.push({
         index,
@@ -96,8 +106,8 @@ function griddify(
               category: "Whitespace",
             },
             key,
-            CSSConfig,
-          ),
+            CSSConfig
+          )
         );
         continue;
       }

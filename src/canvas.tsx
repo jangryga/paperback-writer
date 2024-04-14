@@ -7,22 +7,22 @@ import {
   CanvasConfigType,
   useEditorContext,
   setBackgroundColor,
+  __dev__useUpdateState,
 } from "./canvas_context";
 import { LexerWrapper } from "lexer-rs";
 import { DebugPanel } from "./canvas_debug_panel";
 import { defaultConfig } from "./utils/defaults";
 
 import "./index.css";
-import { setDOMRange } from "./canvas_selection";
+import { logCurrentSelection } from "./utils/logCurrentSelection";
+// import { setDOMRange } from "./canvas_selection";
 
-function CanvasInner({
+const CanvasInner = memo(function CanvasInner({
   canvasConfig,
   ...props
 }: HTMLAttributes<HTMLDivElement> & { canvasConfig: CanvasConfigType }) {
-  const updateEditorState = useUpdateUpdateEditorState();
   const saveSelection = useSaveEditorSelection();
-  const restoreSelection = useRestoreSelection();
-  // const initState = useInitState();
+  const updateState = __dev__useUpdateState();
   const context = useEditorContext();
   const styles = context.config.stylesConfig.styles;
   const ref = useRef<HTMLDivElement>(null);
@@ -31,9 +31,7 @@ function CanvasInner({
 
   useEffect(() => {
     ref.current?.focus();
-    saveSelection(ref.current!, false);
-    updateEditorState("", ref.current!);
-    restoreSelection(ref.current!);
+    updateState("", ref.current!);
     setFirstRenderComplete(true);
   }, []);
 
@@ -42,6 +40,8 @@ function CanvasInner({
       if (context.highlightRow.index !== null) {
         const id = context.grid.rowIds[context.highlightRow.index];
         setBackgroundColor(`.${id}`, styles.BgHighlightColor);
+      } else {
+        console.log("context.highlightRow.index", context.highlightRow.index);
       }
     }
   }, [firstRenderComplete]);
@@ -74,18 +74,16 @@ function CanvasInner({
         className="w-full h-full m-auto focus:outline-none"
         style={{ backgroundColor: styles.BgColor }}
         onSelect={() => {
-          console.log("run");
+          logCurrentSelection();
           saveSelection(ref.current!, true);
         }}
         onInput={() => {
-          saveSelection(ref.current!, false);
-          updateEditorState(ref.current!.innerText, ref.current!);
-          restoreSelection(ref.current!);
+          updateState(ref.current!.innerText, ref.current!);
         }}
       />
     </div>
   );
-}
+});
 
 const Sidebar = memo(function Sidebar() {
   const rows = useEditorContext().grid.rows;
@@ -118,14 +116,14 @@ const Sidebar = memo(function Sidebar() {
 });
 
 function Canvas(
-  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType },
+  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType }
 ) {
   return (
     <CanvasProvider
       initialContext={{
         lexer: new LexerWrapper(true),
         tokens: [],
-        grid: { rows: [], rowIds: [] },
+        grid: { rows: [], rowIds: [], isEmpty: false },
         selection: null,
         highlightRow: { index: 0, prevIndex: null },
         config: props.canvasConfig ?? defaultConfig,

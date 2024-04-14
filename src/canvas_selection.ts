@@ -1,3 +1,4 @@
+import { BASE_SPAN_ID } from "./utils/defaults";
 import { invariant } from "./utils/invariant";
 
 class SelectionNode {
@@ -84,7 +85,7 @@ function saveSelection(element: HTMLElement) {
 }
 
 export function getCurrentHighlightRow(
-  selectionNode: SelectionNode | null,
+  selectionNode: SelectionNode | null
 ): number | null {
   const selection = document.getSelection();
   if (!selection || !selectionNode) return null;
@@ -105,7 +106,7 @@ export function getCurrentHighlightRow(
  * similarly, if there's a new token like in case of "return" -> "return+"
  *
  * Few things:
- * !## tokenSelection tree will be only one node off the correct
+ * !## pevSelection tree will be only one node off the correct
  * !## if selection is not collapsed, it must be correct
  * !## restoreSelection should always have collapsed selection - restoring after dom update
  * 1. iterate at the same time over two trees: original element tree and SelectionNode tree
@@ -114,7 +115,11 @@ export function getCurrentHighlightRow(
  *     - no => offset is correct
  *     - yes => use beginning of next node (have to go up one level from textNode to SPAN, then take next SPAN.text)
  */
-function restoreSelection(node: Node, prevSelNode: SelectionNode | null): void {
+function restoreSelection(
+  node: Node,
+  prevSelNode: SelectionNode | null,
+  modifyOffset: boolean
+): void {
   if (!prevSelNode) return;
   if (prevSelNode.rangeMarker) {
     return setDOMRange(node, node, 0, 0);
@@ -129,21 +134,21 @@ function restoreSelection(node: Node, prevSelNode: SelectionNode | null): void {
       realEndNode,
       realEndNode,
       fakeEndNode.rangeMarker.rangeStartOffset!,
-      fakeEndNode.rangeMarker.rangeEndOffset!,
+      fakeEndNode.rangeMarker.rangeEndOffset!
     );
   }
   invariant(
     typeof fakeEndNode.children !== undefined,
-    "Expected children elements.",
+    "Expected children elements."
   );
   const spanIdx = fakeEndNode.children!.length - 1;
   invariant(
     fakeEndNode.children![spanIdx].containsEnd(),
-    "Expected nested range end.",
+    "Expected nested range end."
   );
   invariant(
     realEndNode.childNodes.length >= spanIdx,
-    "Nested selection out of range.",
+    "Nested selection out of range."
   );
   if (fakeEndNode.children![spanIdx].rangeMarker) {
     const _node = realEndNode.childNodes[spanIdx];
@@ -152,42 +157,56 @@ function restoreSelection(node: Node, prevSelNode: SelectionNode | null): void {
       _node,
       _node,
       _marker?.rangeStartOffset!,
-      _marker?.rangeEndOffset!,
+      _marker?.rangeEndOffset!
     );
   }
   const spanNode = realEndNode.childNodes[spanIdx];
   const textNode = spanNode.childNodes[0];
-  invariant(textNode.nodeType === Node.TEXT_NODE, "Expected TEXT node.");
+  invariant(
+    !textNode || textNode?.nodeType === Node.TEXT_NODE,
+    "Expected TEXT node."
+  );
   const textRangeMarker =
     fakeEndNode.children![spanIdx].children![0].rangeMarker;
   invariant(
     textRangeMarker !== undefined,
-    "Expected textRangeMarker to be defined.",
+    "Expected textRangeMarker to be defined."
   );
-  if (textRangeMarker?.rangeEndOffset! > (textNode as Text).length) {
-    console.warn("Saved offset greater than text length. Walking up the tree.");
+  if (!textNode) {
+  }
+  if (
+    textNode &&
+    textRangeMarker?.rangeEndOffset! > (textNode as Text).length &&
+    !modifyOffset
+  ) {
+    console.warn(
+      `Saved offset greater than text length. Walking up the tree. Offset given: ${textRangeMarker?.rangeEndOffset}, actual length: ${(textNode as Text).length}`
+    );
     invariant(
       realEndNode.childNodes.length > spanIdx + 1,
-      "[Reconciliation error] Expected extra child node on row <div>.",
+      "[Reconciliation error] Expected extra child node on row <div>."
     );
     const nextSpanNode = realEndNode.childNodes[spanIdx + 1];
     const nextTextNode = nextSpanNode.childNodes[0];
     return setDOMRange(nextTextNode, nextTextNode, 1, 1);
   }
 
-  return setDOMRange(
-    textNode,
-    textNode,
-    textRangeMarker?.rangeStartOffset!,
-    textRangeMarker?.rangeEndOffset!,
-  );
+  const offset = textRangeMarker?.rangeStartOffset! - (modifyOffset ? 1 : 0);
+
+  return setDOMRange(textNode, textNode, offset, offset);
+}
+
+export function restoreSelectionToBaseCase() {
+  const baseSpan = document.getElementsByClassName(BASE_SPAN_ID)[0];
+  if (!baseSpan) throw Error("Base span not found");
+  setDOMRange(baseSpan.childNodes[0], baseSpan.childNodes[0], 1, 1);
 }
 
 function setDOMRange(
   nodeStart: Node,
   nodeEnd: Node,
   offsetStart: number,
-  offsetEnd: number,
+  offsetEnd: number
 ): void {
   const domSelection = document.getSelection();
   const range = new Range();
