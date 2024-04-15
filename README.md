@@ -8,6 +8,6 @@
 ### TODO:
 
 - [ ] error boundary handling
-- [ ] better config parsing (optional fields + reconcile w/ default on init)
+- [x] better config parsing (optional fields + reconcile w/ default on init)
 - [ ] fix strings / comments
 - [ ] key overrides (tabs)

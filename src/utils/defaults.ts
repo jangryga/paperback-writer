@@ -3,6 +3,28 @@ import {} from "lexer-rs";
 
 export const BASE_SPAN_ID = "init-xwawea23";
 
+export type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;
+
+export function reconcile<T extends object>(
+  partial: DeepPartial<T>,
+  init: T
+): T {
+  const out: T = { ...init };
+  for (const [k, v] of Object.entries(partial)) {
+    if (typeof v === "object" && v !== null) {
+      // @ts-ignore
+      out[k] = reconcile(v, out[k]);
+    } else {
+      out[k as keyof T] = v;
+    }
+  }
+  return out;
+}
+
 export const defaultConfig: CanvasConfigType = {
   debugMode: false,
   stylesConfig: {

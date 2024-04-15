@@ -9,11 +9,9 @@ import {
 } from "./canvas_context";
 import { LexerWrapper } from "lexer-rs";
 import { DebugPanel } from "./canvas_debug_panel";
-import { defaultConfig } from "./utils/defaults";
+import { DeepPartial, defaultConfig, reconcile } from "./utils/defaults";
 
 import "./index.css";
-import { logCurrentSelection } from "./utils/logCurrentSelection";
-// import { setDOMRange } from "./canvas_selection";
 
 const CanvasInner = memo(function CanvasInner({
   canvasConfig,
@@ -113,7 +111,9 @@ const Sidebar = memo(function Sidebar() {
 });
 
 function Canvas(
-  props: HTMLAttributes<HTMLDivElement> & { canvasConfig?: CanvasConfigType }
+  props: HTMLAttributes<HTMLDivElement> & {
+    config: DeepPartial<CanvasConfigType>;
+  }
 ) {
   return (
     <CanvasProvider
@@ -123,21 +123,21 @@ function Canvas(
         grid: { rows: [], rowIds: [], isEmpty: false },
         selection: null,
         highlightRow: { index: 0, prevIndex: null },
-        config: props.canvasConfig ?? defaultConfig,
+        config: reconcile(props.config, defaultConfig),
         debugger: {
           encoder: new TextEncoder(),
           input: [],
         },
       }}
     >
-      {props.canvasConfig?.debugMode && (
+      {props.config?.debugMode && (
         <>
           <DebugPanel />
         </>
       )}
       <CanvasInner
         {...props}
-        canvasConfig={props.canvasConfig ?? defaultConfig}
+        canvasConfig={reconcile(props.config, defaultConfig)}
       />
     </CanvasProvider>
   );
