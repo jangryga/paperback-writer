@@ -58,7 +58,7 @@ function griddify(
             key={key}
             className={key}
             style={
-              highlight.idx && grid.rows.length === highlight.idx
+              highlight.idx !== null && grid.rows.length === highlight.idx
                 ? { backgroundColor: highlight.highlightColor }
                 : {}
             }

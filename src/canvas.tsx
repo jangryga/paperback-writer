@@ -1,8 +1,6 @@
 import { HTMLAttributes, useEffect, useRef, useState, memo } from "react";
 import {
-  useUpdateUpdateEditorState,
   useSaveEditorSelection,
-  useRestoreSelection,
   CanvasProvider,
   CanvasConfigType,
   useEditorContext,
@@ -74,7 +72,6 @@ const CanvasInner = memo(function CanvasInner({
         className="w-full h-full m-auto focus:outline-none"
         style={{ backgroundColor: styles.BgColor }}
         onSelect={() => {
-          logCurrentSelection();
           saveSelection(ref.current!, true);
         }}
         onInput={() => {

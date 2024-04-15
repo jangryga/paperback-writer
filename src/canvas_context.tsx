@@ -94,7 +94,6 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
     (state: CanvasContextType, action: CanvasActionType) => {
       switch (action.type) {
         case "__dev_UPDATE": {
-          console.log("OLD STATE", state);
           // SAVE_SELECTION
           let preRerenderSelection = saveSelectionInternal(
             action.payload.element
@@ -102,7 +101,6 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           // SET
           let encoder = state.debugger.encoder ?? new TextEncoder();
           const utf8Input = Array.from(encoder.encode(action.payload.text));
-          console.log("utf8Input", utf8Input);
           const tokens = state.lexer.tokenize(action.payload.text);
           const highlightRow = {
             index: getCurrentHighlightRow(preRerenderSelection),
