@@ -7,9 +7,7 @@
 
 ### TODO:
 
-- [ ] add current line indicator
-- [ ] strings + comments need fixing
-- [ ] fix bug with extra lines being added
-- [ ] add tab support
-- [ ] indicate whitespace with special character
-- [ ] add chars to lexer: `?`
+- [ ] error boundary handling
+- [ ] better config parsing (optional fields + reconcile w/ default on init)
+- [ ] fix strings / comments
+- [ ] key overrides (tabs)
