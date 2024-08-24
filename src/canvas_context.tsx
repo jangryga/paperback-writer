@@ -9,6 +9,7 @@ import {
 import { Grid, griddify } from "./canvas_grid";
 import {
   getCurrentHighlightRow,
+  insertAtSelection,
   restoreSelection,
   restoreSelectionToBaseCase,
   saveSelection as saveSelectionInternal,
@@ -23,6 +24,7 @@ export interface CanvasContextType {
   selection: SelectionNode | null;
   highlightRow: { index: number | null; prevIndex: number | null };
   config: CanvasConfigType;
+  // shortcutManager: ShortcutManager;
   debugger: {
     encoder: TextEncoder | null;
     input: number[];
@@ -78,7 +80,13 @@ type CanvasActionType =
   | { type: "SET_CONFIG"; payload: { config: CanvasConfigType } }
   | {
       type: "__dev_UPDATE";
-      payload: { element: HTMLDivElement; text: string };
+      payload: {
+        element: HTMLDivElement;
+        text: string;
+        opts?: {
+          forwardAtSelection: boolean;
+        };
+      };
     };
 type UseCanvasManagerResult = ReturnType<typeof useCanvasManager>;
 
@@ -88,7 +96,13 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
   saveSelection: (element: HTMLDivElement, updateHighlightRow: boolean) => void;
   restoreState: (element: HTMLDivElement) => void;
   setConfig: (config: CanvasConfigType) => void;
-  __dev__updateState: (text: string, element: HTMLDivElement) => void;
+  __dev__updateState: (
+    text: string,
+    element: HTMLDivElement,
+    opts?: {
+      forwardAtSelection: boolean;
+    }
+  ) => void;
 } {
   const [context, dispatch] = useReducer(
     (state: CanvasContextType, action: CanvasActionType) => {
@@ -99,9 +113,13 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
             action.payload.element
           );
           // SET
+          let text = action.payload.text;
+          if (action.payload.opts?.forwardAtSelection) {
+            text = insertAtSelection("    ", text, preRerenderSelection!);
+          }
           let encoder = state.debugger.encoder ?? new TextEncoder();
-          const utf8Input = Array.from(encoder.encode(action.payload.text));
-          const tokens = state.lexer.tokenize(action.payload.text);
+          const utf8Input = Array.from(encoder.encode(text));
+          const tokens = state.lexer.tokenize(text);
           const highlightRow = {
             index: getCurrentHighlightRow(preRerenderSelection),
             prevIndex: state.highlightRow.index,

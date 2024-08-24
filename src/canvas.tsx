@@ -1,4 +1,11 @@
-import { HTMLAttributes, useEffect, useRef, useState, memo } from "react";
+import {
+  HTMLAttributes,
+  useEffect,
+  useRef,
+  useState,
+  memo,
+  useMemo,
+} from "react";
 import {
   useSaveEditorSelection,
   CanvasProvider,
@@ -12,6 +19,7 @@ import { DebugPanel } from "./canvas_debug_panel";
 import { DeepPartial, defaultConfig, reconcile } from "./utils/defaults";
 
 import "./index.css";
+import { ShortcutManager } from "./canvas_shortcut_manager";
 
 const CanvasInner = memo(function CanvasInner({
   canvasConfig,
@@ -24,6 +32,14 @@ const CanvasInner = memo(function CanvasInner({
   const ref = useRef<HTMLDivElement>(null);
   const [mouseDown, setMouseDown] = useState(false);
   const [firstRenderComplete, setFirstRenderComplete] = useState(false);
+  const shortcutManager = useMemo(
+    () => new ShortcutManager(ref.current!, updateState),
+    [ref]
+  );
+
+  useEffect(() => {
+    shortcutManager.register(ref.current);
+  }, [shortcutManager]);
 
   useEffect(() => {
     ref.current?.focus();
@@ -75,6 +91,22 @@ const CanvasInner = memo(function CanvasInner({
         onInput={() => {
           updateState(ref.current!.innerText, ref.current!);
         }}
+        // onFocus={() => {
+        //   document.addEventListener("keydown", (e) => {
+        //     console.log(`KeyboardEvent: key='${e.key}' | code='${e.code}'`);
+        //     const overwrites = ["Tab"];
+        //     if (!overwrites.includes(e.key)) return;
+        //     e.preventDefault();
+        //     if (e.key === "Tab") {
+        //       updateState(ref.current!.innerText, ref.current!, {
+        //         forwardAtSelection: true,
+        //       });
+        //     }
+        //   });
+        // }}
+        onBlur={() => {
+          // context.shortcutManager.cleanup();
+        }}
       />
     </div>
   );
@@ -124,6 +156,7 @@ function Canvas(
         selection: null,
         highlightRow: { index: 0, prevIndex: null },
         config: reconcile(props.config, defaultConfig),
+        // shortcutManager: new ShortcutManager(),
         debugger: {
           encoder: new TextEncoder(),
           input: [],

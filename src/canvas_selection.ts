@@ -216,4 +216,18 @@ function setDOMRange(
   domSelection?.addRange(range);
 }
 
-export { saveSelection, restoreSelection, SelectionNode, setDOMRange };
+function insertAtSelection(
+  input: string,
+  text: string,
+  selection: SelectionNode
+): string {
+  return text;
+}
+
+export {
+  saveSelection,
+  restoreSelection,
+  SelectionNode,
+  setDOMRange,
+  insertAtSelection,
+};
