@@ -1,3 +1,4 @@
+import { LexerWrapper, TokenType } from "lexer-rs";
 import { BASE_SPAN_ID } from "./utils/defaults";
 import { invariant } from "./utils/invariant";
 
@@ -217,11 +218,91 @@ function setDOMRange(
 }
 
 function insertAtSelection(
-  input: string,
-  text: string,
-  selection: SelectionNode
-): string {
-  return text;
+  tokens: TokenType[],
+  toInsert: string,
+  selection: SelectionNode,
+  lexer: LexerWrapper
+): [TokenType[], SelectionNode] {
+  console.log("tokens", tokens);
+  console.log("selection", selection);
+  const level1_NodeIdx = selection.children!.length - 1 ?? 1;
+  console.log("selectionLineNumber", level1_NodeIdx);
+
+  // go to token offset:
+  let minTokenLineOffset = 0;
+  let newlineCount = 0;
+  for (const [idx, token] of tokens.entries()) {
+    if (newlineCount === level1_NodeIdx) {
+      minTokenLineOffset = idx;
+      break;
+    }
+    if (token.kind === "Newline") newlineCount += 1;
+  }
+
+  console.log("minTokenLineOffset", minTokenLineOffset);
+
+  const level1_Node = selection.children![level1_NodeIdx];
+  invariant(
+    typeof level1_Node !== "undefined",
+    "insertAtSelection :: node undefined"
+  );
+
+  const level2_NodeIdx =
+    selection.children![level1_NodeIdx].children!.length - 1;
+  console.log("level2_NodeIdx", level2_NodeIdx);
+  const level2_Node = level1_Node.children![level2_NodeIdx];
+  invariant(
+    typeof level2_Node !== "undefined",
+    "insertAtSelection :: node undefined"
+  );
+
+  const tokenIdx = minTokenLineOffset + level2_NodeIdx;
+
+  console.log("tokenIdx", tokenIdx);
+  const token = tokens[tokenIdx];
+  console.log("inserting into:", token);
+  const rangeOffset = level2_Node.children![0].rangeMarker?.rangeStartOffset;
+
+  console.log("rangeOffset", rangeOffset);
+
+  if (token.category === "Whitespace") {
+    token.value = (parseInt(token.value!) + 4).toString();
+    selection = updateSelectionOnInsert(selection, {
+      type: "expand",
+      value: 4,
+    });
+    console.log("selection after update", selection);
+  }
+
+  return [tokens, selection];
+}
+
+type InsertType = "expand" | "insert";
+
+function updateSelectionOnInsert(
+  selection: SelectionNode,
+  change: { type: InsertType; value?: number }
+): SelectionNode {
+  switch (change.type) {
+    case "expand": {
+      let node = selection;
+      while (node.children && node.children.length > 0) {
+        node = node.children[node.children.length - 1];
+      }
+      invariant(
+        node.rangeMarker !== undefined,
+        "updateSelectionOnInsert :: missing rangeMarker"
+      );
+      node.rangeMarker.rangeStartOffset! += change.value as number;
+      console.log(node.rangeMarker);
+      return selection;
+    }
+    case "insert": {
+      return selection;
+    }
+    default:
+      throw new Error(`Unimplemented :: updateSelectionOnInsert :: ${change}`);
+  }
 }
 
 export {

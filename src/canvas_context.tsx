@@ -114,12 +114,17 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           );
           // SET
           let text = action.payload.text;
-          if (action.payload.opts?.forwardAtSelection) {
-            text = insertAtSelection("    ", text, preRerenderSelection!);
-          }
           let encoder = state.debugger.encoder ?? new TextEncoder();
           const utf8Input = Array.from(encoder.encode(text));
-          const tokens = state.lexer.tokenize(text);
+          let tokens = state.lexer.tokenize(text);
+          if (action.payload.opts?.forwardAtSelection) {
+            [tokens, preRerenderSelection] = insertAtSelection(
+              tokens,
+              "    ",
+              preRerenderSelection!,
+              state.lexer
+            );
+          }
           const highlightRow = {
             index: getCurrentHighlightRow(preRerenderSelection),
             prevIndex: state.highlightRow.index,
@@ -243,10 +248,16 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
   }, []);
 
   const __dev__updateState = useCallback(
-    (text: string, element: HTMLDivElement) => {
+    (
+      text: string,
+      element: HTMLDivElement,
+      opts?: {
+        forwardAtSelection: boolean;
+      }
+    ) => {
       dispatch({
         type: "__dev_UPDATE",
-        payload: { text: text, element: element },
+        payload: { text, element, opts },
       });
     },
     []

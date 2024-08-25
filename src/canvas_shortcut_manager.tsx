@@ -32,11 +32,12 @@ export class ShortcutManager {
     if (!overwrites.includes(e.key)) return;
     e.preventDefault();
 
+    if (!this.canvas) {
+      console.warn("ShortcutManager :: canvas Not Found");
+      return;
+    }
+
     if (e.key === "Tab") {
-      if (!this.canvas) {
-        console.log("canvas not found");
-        return;
-      }
       this.updateState(this.canvas.innerText, this.canvas, {
         forwardAtSelection: true,
       });
