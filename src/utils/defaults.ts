@@ -27,6 +27,7 @@ export function reconcile<T extends object>(
 
 export const defaultConfig: CanvasConfigType = {
   debugMode: false,
+  tabSize: 4,
   stylesConfig: {
     styles: {
       Keyword: "#ff9800",

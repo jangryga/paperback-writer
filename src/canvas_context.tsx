@@ -62,6 +62,7 @@ function highlightSelection(context: CanvasContextType) {
 
 export interface CanvasConfigType {
   debugMode: boolean;
+  tabSize: number;
   stylesConfig: {
     styles: Record<
       keyof typeof TokenCategory | "BgColor" | "BgHighlightColor",
@@ -120,7 +121,7 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
           if (action.payload.opts?.forwardAtSelection) {
             [tokens, preRerenderSelection] = insertAtSelection(
               tokens,
-              "    ",
+              state.config.tabSize,
               preRerenderSelection!,
               state.lexer
             );

@@ -219,7 +219,7 @@ function setDOMRange(
 
 function insertAtSelection(
   tokens: TokenType[],
-  toInsert: string,
+  insertWidth: number,
   selection: SelectionNode,
   lexer: LexerWrapper
 ): [TokenType[], SelectionNode] {
@@ -266,25 +266,69 @@ function insertAtSelection(
   console.log("rangeOffset", rangeOffset);
 
   if (token.category === "Whitespace") {
-    token.value = (parseInt(token.value!) + 4).toString();
+    token.value = (parseInt(token.value!) + insertWidth).toString();
     selection = updateSelectionOnInsert(selection, {
-      type: "expand",
-      value: 4,
+      type: "expand_whitespace",
+      value: insertWidth,
     });
-    console.log("selection after update", selection);
+  } else {
+    const strValue = token.value!;
+    invariant(
+      strValue !== undefined && strValue.length >= rangeOffset!,
+      "insertAtSelection :: Error parsing stirng token offset"
+    );
+    if (rangeOffset === strValue.length) {
+      // insert whitespace after token
+      // TODO: if next token is a whitespace, expand it instead of inserting another whitespace
+      console.log("old tokens", tokens);
+      const nextToken = tokens[tokenIdx + 1];
+      if (nextToken.category === "Whitespace") {
+        nextToken.value = (parseInt(nextToken.value!) + insertWidth).toString();
+        selection = updateSelectionOnInsert(selection, {
+          type: "skip_to_next_whitespace",
+          value: insertWidth,
+          trailingWhitespaceLength: parseInt(nextToken.value!),
+        });
+      } else {
+        tokens = [
+          ...tokens.slice(0, tokenIdx + 1),
+          {
+            kind: "Whitespace",
+            value: insertWidth.toString(),
+            category: "Whitespace",
+          },
+          ...tokens.slice(tokenIdx + 1),
+        ];
+        selection = updateSelectionOnInsert(selection, {
+          type: "insert_whitespace",
+          value: insertWidth,
+        });
+      }
+    } else {
+      console.log(
+        "swap current token for three new ones and update selection accordingly"
+      );
+    }
   }
 
   return [tokens, selection];
 }
 
-type InsertType = "expand" | "insert";
+type InsertType =
+  | "expand_whitespace"
+  | "insert_whitespace"
+  | "skip_to_next_whitespace";
 
 function updateSelectionOnInsert(
   selection: SelectionNode,
-  change: { type: InsertType; value?: number }
+  change: {
+    type: InsertType;
+    value?: number;
+    trailingWhitespaceLength?: number;
+  }
 ): SelectionNode {
   switch (change.type) {
-    case "expand": {
+    case "expand_whitespace": {
       let node = selection;
       while (node.children && node.children.length > 0) {
         node = node.children[node.children.length - 1];
@@ -297,12 +341,53 @@ function updateSelectionOnInsert(
       console.log(node.rangeMarker);
       return selection;
     }
-    case "insert": {
+    // before newline, EOF
+    case "insert_whitespace": {
+      appendWhitespaceToRowNode(selection, change.value!, change.value!);
+      return selection;
+    }
+    // before whitespace
+    case "skip_to_next_whitespace": {
+      appendWhitespaceToRowNode(
+        selection,
+        change.value!,
+        change.trailingWhitespaceLength!
+      );
       return selection;
     }
     default:
       throw new Error(`Unimplemented :: updateSelectionOnInsert :: ${change}`);
   }
+}
+
+function appendWhitespaceToRowNode(
+  root: SelectionNode,
+  offset: number,
+  length: number
+): void {
+  let prev: any = null;
+  let prevprev: any = null;
+  let node = root;
+  while (node.children && node.children.length > 0) {
+    if (prev !== null) prevprev = prev;
+    prev = node;
+    node = node.children[node.children.length - 1];
+  }
+  const span = document.createElement("span");
+  span.textContent = " ".repeat(length);
+  const newWhitespaceNode = new SelectionNode(span, new Range());
+  invariant(
+    node.rangeMarker !== undefined,
+    "updateSelectionOnInsert :: missing rangeMarker"
+  );
+  node.rangeMarker = undefined;
+  newWhitespaceNode.children![0].rangeMarker = {
+    rangeEnd: true,
+    rangeEndOffset: offset,
+    rangeStart: true,
+    rangeStartOffset: offset,
+  };
+  prevprev.children.push(newWhitespaceNode);
 }
 
 export {
