@@ -39,7 +39,7 @@
     "./dist/index.css"
   ],
   "dependencies": {
-    "lexer-rs": "0.1.43",
+    "lexer-rs": "0.1.47",
     "superjson": "^2.2.1"
   },
   "peerDependencies": {

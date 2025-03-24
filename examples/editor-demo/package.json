@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "lexer-rs": "0.1.47",
     "paperback-writer": "link:/Users/mycs/Desktop/projects/paperback-writer",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
