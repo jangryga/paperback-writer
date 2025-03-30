@@ -1,4 +1,4 @@
-import { LexerWrapper, TokenType } from "lexer-rs";
+import { TokenType } from "lexer-rs";
 import { BASE_SPAN_ID } from "./utils/defaults";
 import { invariant } from "./utils/invariant";
 
@@ -85,9 +85,7 @@ function saveSelection(element: HTMLElement) {
   return new SelectionNode(element, range);
 }
 
-export function getCurrentHighlightRow(
-  selectionNode: SelectionNode | null
-): number | null {
+export function getCurrentHighlightRow(selectionNode: SelectionNode | null): number | null {
   const selection = document.getSelection();
   if (!selection || !selectionNode) return null;
   const range = selection.getRangeAt(0);
@@ -116,11 +114,7 @@ export function getCurrentHighlightRow(
  *     - no => offset is correct
  *     - yes => use beginning of next node (have to go up one level from textNode to SPAN, then take next SPAN.text)
  */
-function restoreSelection(
-  node: Node,
-  prevSelNode: SelectionNode | null,
-  modifyOffset: boolean
-): void {
+function restoreSelection(node: Node, prevSelNode: SelectionNode | null, modifyOffset: boolean): void {
   if (!prevSelNode) return;
   if (prevSelNode.rangeMarker) {
     return setDOMRange(node, node, 0, 0);
@@ -138,48 +132,24 @@ function restoreSelection(
       fakeEndNode.rangeMarker.rangeEndOffset!
     );
   }
-  invariant(
-    typeof fakeEndNode.children !== undefined,
-    "Expected children elements."
-  );
+  // console.log("DEBUG:", endNodeIdx, node.);
+  invariant(typeof fakeEndNode.children !== undefined, "Expected children elements.");
   const spanIdx = fakeEndNode.children!.length - 1;
-  invariant(
-    fakeEndNode.children![spanIdx].containsEnd(),
-    "Expected nested range end."
-  );
-  invariant(
-    realEndNode.childNodes.length >= spanIdx,
-    "Nested selection out of range."
-  );
+  invariant(fakeEndNode.children![spanIdx].containsEnd(), "Expected nested range end.");
+  invariant(realEndNode.childNodes.length >= spanIdx, "Nested selection out of range.");
   if (fakeEndNode.children![spanIdx].rangeMarker) {
     const _node = realEndNode.childNodes[spanIdx];
     const _marker = fakeEndNode.children![spanIdx].rangeMarker;
-    return setDOMRange(
-      _node,
-      _node,
-      _marker?.rangeStartOffset!,
-      _marker?.rangeEndOffset!
-    );
+    return setDOMRange(_node, _node, _marker?.rangeStartOffset!, _marker?.rangeEndOffset!);
   }
   const spanNode = realEndNode.childNodes[spanIdx];
   const textNode = spanNode.childNodes[0];
-  invariant(
-    !textNode || textNode?.nodeType === Node.TEXT_NODE,
-    "Expected TEXT node."
-  );
-  const textRangeMarker =
-    fakeEndNode.children![spanIdx].children![0].rangeMarker;
-  invariant(
-    textRangeMarker !== undefined,
-    "Expected textRangeMarker to be defined."
-  );
+  invariant(!textNode || textNode?.nodeType === Node.TEXT_NODE, "Expected TEXT node.");
+  const textRangeMarker = fakeEndNode.children![spanIdx].children![0].rangeMarker;
+  invariant(textRangeMarker !== undefined, "Expected textRangeMarker to be defined.");
   if (!textNode) {
   }
-  if (
-    textNode &&
-    textRangeMarker?.rangeEndOffset! > (textNode as Text).length &&
-    !modifyOffset
-  ) {
+  if (textNode && textRangeMarker?.rangeEndOffset! > (textNode as Text).length && !modifyOffset) {
     console.warn(
       `Saved offset greater than text length. Walking up the tree. Offset given: ${textRangeMarker?.rangeEndOffset}, actual length: ${(textNode as Text).length}`
     );
@@ -203,12 +173,7 @@ export function restoreSelectionToBaseCase() {
   setDOMRange(baseSpan.childNodes[0], baseSpan.childNodes[0], 1, 1);
 }
 
-function setDOMRange(
-  nodeStart: Node,
-  nodeEnd: Node,
-  offsetStart: number,
-  offsetEnd: number
-): void {
+function setDOMRange(nodeStart: Node, nodeEnd: Node, offsetStart: number, offsetEnd: number): void {
   const domSelection = document.getSelection();
   const range = new Range();
   range.setStart(nodeStart, offsetStart);
@@ -220,13 +185,12 @@ function setDOMRange(
 function insertAtSelection(
   tokens: TokenType[],
   insertWidth: number,
-  selection: SelectionNode,
-  lexer: LexerWrapper
+  selection: SelectionNode
+  // lexer: LexerWrapper
 ): [TokenType[], SelectionNode] {
-  console.log("tokens", tokens);
-  console.log("selection", selection);
-  const level1_NodeIdx = selection.children!.length - 1 ?? 1;
+  const level1_NodeIdx = selection.children?.length ? selection.children?.length - 1 : 1;
   console.log("selectionLineNumber", level1_NodeIdx);
+  console.log("DEBUG", selection.children);
 
   // go to token offset:
   let minTokenLineOffset = 0;
@@ -242,19 +206,29 @@ function insertAtSelection(
   console.log("minTokenLineOffset", minTokenLineOffset);
 
   const level1_Node = selection.children![level1_NodeIdx];
-  invariant(
-    typeof level1_Node !== "undefined",
-    "insertAtSelection :: node undefined"
-  );
+  invariant(typeof level1_Node !== "undefined", "insertAtSelection :: node undefined");
+  //   {
+  //     "kind": "Indent",
+  //     "value": "8",
+  //     "category": "Whitespace"
+  // }
+  //   {
+  //     "kind": "Dedent",
+  //     "value": "8",
+  //     "category": "Whitespace"
+  // }
+  if (level1_Node.children!.length === 0) {
+    console.log("tokens", tokens);
+    const token = tokens[minTokenLineOffset];
+    console.log("inserting into:", token);
 
-  const level2_NodeIdx =
-    selection.children![level1_NodeIdx].children!.length - 1;
+    return [tokens, selection];
+  }
+
+  const level2_NodeIdx = level1_Node.children!.length - 1;
   console.log("level2_NodeIdx", level2_NodeIdx);
   const level2_Node = level1_Node.children![level2_NodeIdx];
-  invariant(
-    typeof level2_Node !== "undefined",
-    "insertAtSelection :: node undefined"
-  );
+  invariant(level2_Node !== undefined, "insertAtSelection :: node undefined");
 
   const tokenIdx = minTokenLineOffset + level2_NodeIdx;
 
@@ -279,7 +253,6 @@ function insertAtSelection(
     );
     if (rangeOffset === strValue.length) {
       // insert whitespace after token
-      // TODO: if next token is a whitespace, expand it instead of inserting another whitespace
       console.log("old tokens", tokens);
       const nextToken = tokens[tokenIdx + 1];
       if (nextToken.category === "Whitespace") {
@@ -305,19 +278,14 @@ function insertAtSelection(
         });
       }
     } else {
-      console.log(
-        "swap current token for three new ones and update selection accordingly"
-      );
+      console.log("swap current token for three new ones and update selection accordingly");
     }
   }
 
   return [tokens, selection];
 }
 
-type InsertType =
-  | "expand_whitespace"
-  | "insert_whitespace"
-  | "skip_to_next_whitespace";
+type InsertType = "expand_whitespace" | "insert_whitespace" | "skip_to_next_whitespace";
 
 function updateSelectionOnInsert(
   selection: SelectionNode,
@@ -333,10 +301,7 @@ function updateSelectionOnInsert(
       while (node.children && node.children.length > 0) {
         node = node.children[node.children.length - 1];
       }
-      invariant(
-        node.rangeMarker !== undefined,
-        "updateSelectionOnInsert :: missing rangeMarker"
-      );
+      invariant(node.rangeMarker !== undefined, "updateSelectionOnInsert :: missing rangeMarker");
       node.rangeMarker.rangeStartOffset! += change.value as number;
       console.log(node.rangeMarker);
       return selection;
@@ -348,11 +313,7 @@ function updateSelectionOnInsert(
     }
     // before whitespace
     case "skip_to_next_whitespace": {
-      appendWhitespaceToRowNode(
-        selection,
-        change.value!,
-        change.trailingWhitespaceLength!
-      );
+      appendWhitespaceToRowNode(selection, change.value!, change.trailingWhitespaceLength!);
       return selection;
     }
     default:
@@ -360,11 +321,7 @@ function updateSelectionOnInsert(
   }
 }
 
-function appendWhitespaceToRowNode(
-  root: SelectionNode,
-  offset: number,
-  length: number
-): void {
+function appendWhitespaceToRowNode(root: SelectionNode, offset: number, length: number): void {
   let prev: any = null;
   let prevprev: any = null;
   let node = root;
@@ -376,10 +333,7 @@ function appendWhitespaceToRowNode(
   const span = document.createElement("span");
   span.textContent = " ".repeat(length);
   const newWhitespaceNode = new SelectionNode(span, new Range());
-  invariant(
-    node.rangeMarker !== undefined,
-    "updateSelectionOnInsert :: missing rangeMarker"
-  );
+  invariant(node.rangeMarker !== undefined, "updateSelectionOnInsert :: missing rangeMarker");
   node.rangeMarker = undefined;
   newWhitespaceNode.children![0].rangeMarker = {
     rangeEnd: true,
@@ -390,10 +344,4 @@ function appendWhitespaceToRowNode(
   prevprev.children.push(newWhitespaceNode);
 }
 
-export {
-  saveSelection,
-  restoreSelection,
-  SelectionNode,
-  setDOMRange,
-  insertAtSelection,
-};
+export { saveSelection, restoreSelection, SelectionNode, setDOMRange, insertAtSelection };

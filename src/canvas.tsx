@@ -1,11 +1,4 @@
-import {
-  HTMLAttributes,
-  useEffect,
-  useRef,
-  useState,
-  memo,
-  useMemo,
-} from "react";
+import { HTMLAttributes, useEffect, useRef, useState, memo, useMemo } from "react";
 import {
   useSaveEditorSelection,
   CanvasProvider,
@@ -32,10 +25,7 @@ const CanvasInner = memo(function CanvasInner({
   const ref = useRef<HTMLDivElement>(null);
   const [mouseDown, setMouseDown] = useState(false);
   const [firstRenderComplete, setFirstRenderComplete] = useState(false);
-  const shortcutManager = useMemo(
-    () => new ShortcutManager(ref.current!, updateState),
-    [ref]
-  );
+  const shortcutManager = useMemo(() => new ShortcutManager(ref.current!, updateState), [ref]);
 
   useEffect(() => {
     shortcutManager.register(ref.current);
@@ -70,8 +60,7 @@ const CanvasInner = memo(function CanvasInner({
         onMouseMove={() => {
           if (mouseDown) {
             if (!context.highlightRow.index) return;
-            const highlightId =
-              context.grid.rowIds[context.highlightRow.index!];
+            const highlightId = context.grid.rowIds[context.highlightRow.index!];
             const sidebarId = `#sidebar-${context.highlightRow.index!}`;
             setBackgroundColor(sidebarId, styles.BgColor);
             setBackgroundColor(`.${highlightId}`, styles.BgColor);
@@ -119,10 +108,7 @@ const Sidebar = memo(function Sidebar() {
   const styles = context.config.stylesConfig.styles;
 
   return (
-    <div
-      className="w-[60px] flex flex-col h-full"
-      style={{ backgroundColor: styles.BgColor }}
-    >
+    <div className="w-[60px] flex flex-col h-full" style={{ backgroundColor: styles.BgColor }}>
       <ul className="w-full">
         {rows.map((r) => (
           <li
@@ -130,10 +116,8 @@ const Sidebar = memo(function Sidebar() {
             className="text-gray-400 text-center w-full"
             id={`sidebar-${r.index}`}
             style={{
-              backgroundColor:
-                currIndex === r.index ? styles.BgHighlightColor : "",
-            }}
-          >
+              backgroundColor: currIndex === r.index ? styles.BgHighlightColor : "",
+            }}>
             {r.index + 1}
           </li>
         ))}
@@ -161,17 +145,13 @@ function Canvas(
           encoder: new TextEncoder(),
           input: [],
         },
-      }}
-    >
+      }}>
       {props.config?.debugMode && (
         <>
           <DebugPanel />
         </>
       )}
-      <CanvasInner
-        {...props}
-        canvasConfig={reconcile(props.config, defaultConfig)}
-      />
+      <CanvasInner {...props} canvasConfig={reconcile(props.config, defaultConfig)} />
     </CanvasProvider>
   );
 }

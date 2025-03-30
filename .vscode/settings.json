@@ -6,12 +6,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
   "files.exclude": {
     "**/.git": true,
     "external": true,
@@ -21,9 +15,11 @@
     ".github": true,
     "screenshots": true
   },
-  "cSpell.enableFiletypes": ["!jsx-tags"],
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "files.autoSave": "onFocusChange"
+  "files.autoSave": "onFocusChange",
+  "prettier.printWidth": 120,
+  "prettier.bracketSpacing": true,
+  "prettier.bracketSameLine": true
 }

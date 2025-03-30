@@ -16,11 +16,23 @@ export function renderElement(
       return <span />;
     }
     case 2 /* StringMultiline */:
-      return <span key={key}>{token.value}</span>;
+      return (
+        <span key={key} style={{ color: textColor }}>
+          {token.value}
+        </span>
+      );
     case 3 /* CommentSingleline */:
-      return <span key={key}>{token.value}</span>;
+      return (
+        <span key={key} style={{ color: textColor }}>
+          {token.value}
+        </span>
+      );
     case 61 /* string */:
-      return <span key={key}>{token.value}</span>;
+      return (
+        <span key={key} style={{ color: textColor }}>
+          {token.value}
+        </span>
+      );
     case 187 /* Eof */:
       return <span key={key} />;
     case 188 /* Identity */:
@@ -30,7 +42,11 @@ export function renderElement(
         </span>
       );
     case 189 /** Newline */:
-      return <br />;
+      return (
+        <span>
+          <br />
+        </span>
+      );
     case 190 /** Whitespace */:
       return (
         <span key={key}>{"\u00A0".repeat(Number.parseInt(token.value!))}</span>
