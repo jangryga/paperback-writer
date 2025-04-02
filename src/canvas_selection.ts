@@ -321,6 +321,19 @@ function updateSelectionOnInsert(
   }
 }
 
+function findMarkerNode(node: SelectionNode): SelectionNode {
+  if (node.rangeMarker) return node;
+  invariant(node.children && node.children.length > 0);
+  return findMarkerNode(node.children[node.children.length - 1]);
+}
+
+function moveSelection(node: SelectionNode, _move?: any) {
+  const markerNode = findMarkerNode(node);
+  markerNode.rangeMarker!.rangeEndOffset = markerNode.rangeMarker!.rangeEndOffset! + 1;
+  markerNode.rangeMarker!.rangeStartOffset = markerNode.rangeMarker!.rangeStartOffset! + 1;
+  return node;
+}
+
 function appendWhitespaceToRowNode(root: SelectionNode, offset: number, length: number): void {
   let prev: any = null;
   let prevprev: any = null;
@@ -344,4 +357,4 @@ function appendWhitespaceToRowNode(root: SelectionNode, offset: number, length: 
   prevprev.children.push(newWhitespaceNode);
 }
 
-export { saveSelection, restoreSelection, SelectionNode, setDOMRange, insertAtSelection };
+export { saveSelection, restoreSelection, SelectionNode, setDOMRange, insertAtSelection, moveSelection };

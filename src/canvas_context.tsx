@@ -3,6 +3,7 @@ import { ReactNode, createContext, useCallback, useContext, useReducer } from "r
 import { Grid, griddify } from "./canvas_grid";
 import {
   getCurrentHighlightRow,
+  insertAtSelection,
   // insertAtSelection,
   restoreSelection,
   restoreSelectionToBaseCase,
@@ -10,7 +11,7 @@ import {
   type SelectionNode,
 } from "./canvas_selection";
 import ReactDOMServer from "react-dom/server";
-import { expandStringTokens } from "./wip_expand_tokens";
+import { expandStringsOnNewlines } from "./wip_expand_tokens";
 
 export interface CanvasContextType {
   tokens: TokenType[];
@@ -108,16 +109,16 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
         const utf8Input = Array.from(encoder.encode(text));
         let tokens = state.lexer.tokenize(text);
 
-        tokens = expandStringTokens(tokens, preRerenderSelection);
+        ({ tokens, selection: preRerenderSelection } = expandStringsOnNewlines(tokens, preRerenderSelection));
 
-        // if (action.payload.opts?.forwardAtSelection) {
-        //   [tokens, preRerenderSelection] = insertAtSelection(
-        //     tokens,
-        //     state.config.tabSize,
-        //     preRerenderSelection!
-        //     // state.lexer
-        //   );
-        // }
+        if (action.payload.opts?.forwardAtSelection) {
+          [tokens, preRerenderSelection] = insertAtSelection(
+            tokens,
+            state.config.tabSize,
+            preRerenderSelection!
+            // state.lexer
+          );
+        }
         const highlightRow = {
           index: getCurrentHighlightRow(preRerenderSelection),
           prevIndex: state.highlightRow.index,
@@ -129,10 +130,7 @@ function useCanvasManager(initialCanvasContext: CanvasContextType): {
         });
         // RESTORE_SELECTION
         const element = action.payload.element;
-        console.log("grid", grid);
-        const x = ReactDOMServer.renderToString(<>{grid.rows.map((row) => row.elements)}</>);
-        console.log("DEBUGGGGGG:", x);
-        element.innerHTML = x;
+        element.innerHTML = ReactDOMServer.renderToString(<>{grid.rows.map((row) => row.elements)}</>);
         if (grid.isEmpty) {
           restoreSelectionToBaseCase();
         } else {
